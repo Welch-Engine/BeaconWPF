@@ -35,7 +35,7 @@ jobs:
             dotnet tool install -g vpk
             vpk download github --repoUrl https://github.com/Welch-Engine/BeaconWPF
             vpk pack -u MyUniqueIdentifier -v ${{ steps.get-version.outputs.version }} -p publish
-            vpk upload github --repoUrl https://github.com/Welch-Engine/BeaconWPF --publish --releaseName "MyProject ${{ steps.get-version.outputs.version }}" --tag v${{ steps.get-version.outputs.version }}
+            vpk upload github --repoUrl https://github.com/Welch-Engine/BeaconWPF --publish --releaseName "BeaconWPF ${{ steps.get-version.outputs.version }}" --tag v${{ steps.get-version.outputs.version }}
 
         
         # - uses: actions/create-release@v1
