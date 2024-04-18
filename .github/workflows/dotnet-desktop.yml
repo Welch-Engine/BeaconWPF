@@ -14,7 +14,12 @@ jobs:
       
      steps:
         - uses: actions/checkout@v3
-     
+
+        - name: Get Version from Project File
+        id: get-version
+        shell: bash
+        run: echo "version=$(grep -oE '<Version>[^<]+' BeaconWPF/BeaconWPF.csproj | sed 's/<Version>//')" >> $GITHUB_OUTPUT
+
         - uses: actions/setup-dotnet@v3
           with: 
             dotnet-version: 8.0.x
@@ -23,18 +28,26 @@ jobs:
   
         - run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
   
-        - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x64 -p:PublishSingleFile=true -p:AssemblyName=Beacon -p:IncludeAllContentForSelfExtract=true
+        - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x64 -p:PublishSingleFile=true -p:AssemblyName=Beacon -p:IncludeAllContentForSelfExtract=true -o .\publish
         
-        - uses: actions/create-release@v1
-          id: create_release
-          env: 
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with: 
-            tag_name: ${{ github.ref }} 
-            release_name: ${{ github.ref }}
+          - name: Create Velopack Release
+        run: |
+          dotnet tool install -g vpk
+          vpk download github --repoUrl https://github.com/Welch-Engine/BeaconWPF
+          vpk pack -u MyUniqueIdentifier -v ${{ steps.get-version.outputs.version }} -p publish
+          vpk upload github --repoUrl https://github.com/Welch-Engine/BeaconWPF --publish --releaseName "MyProject ${{ steps.get-version.outputs.version }}" --tag v${{ steps.get-version.outputs.version }}
 
-        - uses: csexton/release-asset-action@v2
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            pattern: BeaconWPF\bin\Release\net8.0-windows7.0\win-x64\publish\*.exe
-            release-url: ${{ steps.create_release.outputs.upload_url }}
+        
+        # - uses: actions/create-release@v1
+        #   id: create_release
+        #   env: 
+        #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #   with: 
+        #     tag_name: ${{ github.ref }} 
+        #     release_name: ${{ github.ref }}
+
+        # - uses: csexton/release-asset-action@v2
+        #   with:
+        #     github-token: ${{ secrets.GITHUB_TOKEN }}
+        #     pattern: BeaconWPF\bin\Release\net8.0-windows7.0\win-x64\publish\*.exe
+        #     release-url: ${{ steps.create_release.outputs.upload_url }}

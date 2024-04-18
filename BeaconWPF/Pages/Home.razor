@@ -1,1 +1,62 @@
 ﻿@page "/"
+@using System.Text
+@using Velopack
+@using Velopack.Sources
+
+<div>
+    @status
+    <br/>
+    @availableVersion
+</div>
+
+@code{
+
+    private UpdateManager _um;
+    private UpdateInfo _update;
+
+    private string status = "";
+    private string availableVersion = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _um = new UpdateManager(new GithubSource("https://github.com/Welch-Engine/BeaconWPF", "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", false));
+
+        // if (_um.IsInstalled)
+        // {
+        //     // check for new version
+        //     var newVersion = await _um.CheckForUpdatesAsync();
+
+        //     if (newVersion == null)
+        //         return; // no update available
+
+        //     availableVersion = newVersion.TargetFullRelease.Version.Major.ToString() + newVersion.TargetFullRelease.Version.Minor.ToString() + newVersion.TargetFullRelease.Version.Patch.ToString();
+        // }
+
+        UpdateStatus();
+    }
+
+    private void UpdateStatus()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine($"Velopack version: {VelopackRuntimeInfo.VelopackNugetVersion}");
+        sb.AppendLine($"This app version: {(_um.IsInstalled ? _um.CurrentVersion : "(n/a - not installed)")}");
+
+        if (_update != null)
+        {
+            sb.AppendLine($"Update available: {_update.TargetFullRelease.Version}");
+        }
+        else
+        {
+        }
+
+        if (_um.IsUpdatePendingRestart)
+        {
+            sb.AppendLine("Update ready, pending restart to install");
+        }
+        else
+        {
+        }
+
+        status = sb.ToString();
+    }
+}

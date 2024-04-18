@@ -12,11 +12,13 @@
 
 		<Title>Beacon</Title>
 		<Author>Newt Welch</Author>
-		<Version>1.0.0</Version>
+		<Version>0.0.2</Version>
 		<PublisherName>Welch Engine</PublisherName>
 		<AssemblyTitle>Beacon</AssemblyTitle>
 		<AssemblyName>Beacon</AssemblyName>
-		<ProductName>Beacon</ProductName>
+		<AssemblyVersion>0.0.2</AssemblyVersion>
+		
+		<StartupObject>BeaconWPF.Program</StartupObject>
 		
 		<!-- Project Options -->
         <Nullable>enable</Nullable>
@@ -56,6 +58,7 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+        <PackageReference Include="Velopack" Version="0.0.359" />
     </ItemGroup>
 
     <ItemGroup>
