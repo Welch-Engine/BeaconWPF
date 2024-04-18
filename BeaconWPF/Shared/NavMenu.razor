@@ -1,0 +1,59 @@
+﻿<button class="absolute bottom-3 right-0 z-50 bg-gray_1 p-4 pr-8 rounded-l-xl font-ark transition-all shadow-xl shadow-black
+               md:hidden
+               @(!isHidden ? "translate-x-20" : "")"
+        onclick="@(() => { isHidden = !isHidden; })">
+    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 448 512"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z" /></svg>
+</button>
+
+<aside class="absolute bottom-3 z-50 right-3 w-15 bg-gray_1 font-ark text-base flex flex-col-reverse drop-shadow-lg rounded-3xl 
+              md:flex-col transition-all h-fit md:static md:h-full md:rounded-br-3xl md:rounded-l-none 
+              @(isHidden ? "translate-x-20 md:translate-x-0" : "" )">
+
+    <nav class="flex flex-col items-center flex-1 md:pt-3">
+
+        <NavLink class="flex items-center justify-center w-16 h-12 text-white hover:text-primary" ActiveClass="text-primary" Match="NavLinkMatch.All" href="/">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 576 512"><path d="M64 0C28.7 0 0 28.7 0 64V352c0 35.3 28.7 64 64 64H240l-10.7 32H160c-17.7 0-32 14.3-32 32s14.3 32 32 32H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H346.7L336 416H512c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H64zM512 64V288H64V64H512z" /></svg>
+        </NavLink>
+
+        <NavLink class="flex items-center justify-center w-16 h-12 text-white hover:text-primary" ActiveClass="text-primary" href="/SongLibrary">
+            S
+        </NavLink>
+
+        <NavLink class="flex items-center justify-center w-16 h-12 text-white hover:text-primary" ActiveClass="text-primary" href="/BibleLibrary">
+            B    
+        </NavLink>
+
+        <div class="h-[2px] w-full px-2 rounded-xl md:hidden">
+            <div class="w-full h-full bg-white_normal opacity-10"></div>
+        </div>
+
+        <button class="flex items-center justify-center w-16 h-12 text-white hover:text-primary md:hidden"
+                onclick="@(() => { isHidden = !isHidden; })">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 256 512"><path d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z" /></svg>
+        </button>
+    </nav>
+    
+    <nav class="flex flex-col items-center md:pb-3">
+
+        <NavLink class="flex items-center justify-center w-16 h-12 text-white hover:text-primary" ActiveClass="text-primary" href="/History">
+            H    
+        </NavLink>        
+        
+        <NavLink class="flex items-center justify-center w-16 h-12 text-white hover:text-primary" ActiveClass="text-primary" href="/Settings">
+            O
+        </NavLink>
+
+        <div class="h-[2px] w-full px-2 rounded-xl md:hidden">
+            <div class="w-full h-full bg-white_normal opacity-10"></div>
+        </div>
+
+    </nav>
+
+
+</aside>
+
+
+@code{
+    private bool isHidden = true;
+
+}

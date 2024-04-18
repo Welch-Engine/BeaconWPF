@@ -1,0 +1,292 @@
+﻿@page "/SongLibrary"
+@inject ISongService songService
+@inject IJSRuntime jSRuntime
+
+<div class="absolute top-0 left-0 hidden w-16 h-full bg-gray_2 -z-10 md:block"> </div>
+
+<div class="relative flex w-full h-full">
+
+    <!-- LEFT HALF -->
+    <div class="z-10 flex flex-col self-start w-full h-full gap-3 p-3 bg-gray_2 rounded-r-3xl md:w-5/12 ">
+
+        <!-- ADD SONG -->
+        <div class="flex justify-between w-full">
+            <ToggleButton Icon="L" Message="VIEW QUEUE" Css="border-gray_1 px-6 py-3 " IsChecked="songQueuesMode" OnClick="ToggleSongQueuesMode"></ToggleButton>
+            <Button Icon="S" Message="ADD SONG" Background="1" Css="@(songQueuesMode ? "hidden" : "hover:bg-opacity-50 hover:text-white px-6 py-3")" OnClick="AddSong"></Button>
+            <Button Icon="R" Message="CLEAR QUEUE" Background="1" Css="@(songQueuesMode ? "hover:bg-opacity-50 hover:text-white px-6 py-3" : "hidden")" OnClick="ClearQueue"></Button>
+        </div>
+
+        <!-- QUERY SONG INPUT -->
+        @if(!songQueuesMode){
+            <DebounceInput type="text" class="w-full h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Search..." DebounceTime="200"
+                           @bind-Value="searchTerm" @bind-Value:event="oninput" OnValueChanged="OnInputQuery" @onkeydown="((args) => OnSearchInputKeyDown(args))" />
+        }
+        <!-- SONG LIST -->
+        <SongList Songs="songs" SelectedSong="selectedSong" OnSongChanged="OnSongChange"
+                  AddRemoveSongFromQueue="@((song) => AddRemoveSongFromQueue(song))" DeleteSong="DeleteSong"></SongList>
+    </div>
+
+    <!-- EDIT SONG: LEFT HALF -->
+    <div class="absolute flex flex-col bg-gray_2 h-full self-start p-3 gap-6 z-10 rounded-r-3xl w-full 
+                md:w-5/12 @(isEditMode ? "" : "hidden")">
+        
+        <label class="-mb-5 font-bold tracking-widest">LYRIC EDITOR</label>
+        <textarea class="w-full h-full p-4 text-sm bg-black bg-opacity-50 border-0 rounded-xl" placeholder="Lyrics" spellcheck="false"
+                  @bind="@selectedSong.LyricText" @bind:event="oninput"></textarea>
+
+        <p class="-mb-5 font-bold tracking-widest">SEQUENCE</p>
+        <input class="w-full h-12 p-4 text-sm bg-black bg-opacity-50 border-0 rounded-xl placeholder:opacity-50" placeholder="1, C, 2..." @bind-Value="@selectedSong.Sequence" @bind-Value:event="oninput" />
+        
+        <p class="-mb-5 font-bold tracking-widest">LANGUAGE</p>
+        <input class="w-full h-12 p-4 text-sm bg-black bg-opacity-50 border-0 rounded-xl placeholder:opacity-50" placeholder="Language" @bind-Value="@selectedSong.Language" @bind-Value:event="oninput" />
+
+        <p class="-mb-5 font-bold tracking-widest">TAGS</p>
+        <input class="w-full h-12 p-4 text-sm bg-black bg-opacity-50 border-0 rounded-xl placeholder:opacity-50" placeholder="Tags" @bind-Value="@selectedSong.Tags" @bind-Value:event="oninput" />
+
+    </div>
+
+    <!-- BACKGROUND GRAY 3 -->
+    <div class="absolute w-full h-40 bg-gray_3 -z-0"></div>
+
+    <!-- RIGHT HALF -->
+    <div class="flex flex-col w-7/12 h-full z-10
+                @(showSongInfo ? "absolute w-full md:static md:w-7/12" : "hidden md:flex")">
+
+        <div class="flex items-center justify-between w-full h-40 px-10 bg-gray_3">
+
+            <!-- TITLE AND AUTHOR -->
+            <div class="flex flex-col w-full gap-1 mr-2">
+                <input class="line-clamp-1 rounded-xl w-full @(isEditMode ? "bg-black px-6 border-0 text-lg md:text-2xl" : "bg-transparent border-0 font-bold md:text-4xl text-xl")" disabled="@(!isEditMode)" spellcheck="false" placeholder="Title" @bind-Value="@selectedSong.Title" @bind-Value:event="oninput" />
+                <input class="text-sm line-clamp-1 rounded-xl w-full @(isEditMode ? "bg-black px-6 border-0" : "bg-transparent border-0 -mt-5")" disabled="@(!isEditMode)" spellcheck="false" placeholder="Author" @bind-Value="@selectedSong.Author" @bind-Value:event="oninput" />
+            </div>
+
+            <div class="flex flex-col gap-3 min-w-fit w-fit whitespace-nowrap">
+                @if (showSongInfo)
+                {
+                    <Button Icon="b" Message="BACK" Css="px-6 py-3 md:hidden" Background="2" OnClick="(() => {showSongInfo = false;})"></Button>
+                }
+
+                @if (selectedSong.Id != 0)
+                {
+                    <ToggleButton Icon="@(isEditMode ? "s" : "E")" Message="@(isEditMode ? "SAVE" : "EDIT")" Css="border-gray_1 min-w-fit" OnClick="ToggleEditMode"></ToggleButton>
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col w-full h-full py-1 overflow-y-hidden bg-black">
+
+            <!-- LYRIC LIST -->
+            <LyricList Lyrics="selectedSong.Lyrics()" SelectedLyric="selectedLyric" OnLyricChanged="OnLyricChange"></LyricList>
+
+            <div class="flex w-full gap-2 p-1 overflow-x-auto h-fit">
+                @foreach(var language in songLanguages)
+                {
+                    var isSelected = selectedSong.Id == language.Id;
+                    <Button HasIconMargin="false" Message="@language.Language" Css="@(isSelected ? "bg-primary px-6 py-3 text-white" : "px-6 py-3 bg-gray_2")"
+                            OnClick="(async () => {await OnSongChange(language); })"></Button>
+                }
+                @if (selectedSong.Id != 0)
+                {
+                    <Button Message="+" HasIconMargin="false" Css="bg-gray_1 px-6 py-3 text-white"></Button>
+                }
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@code{
+    private List<Song> songs = new List<Song>();
+    private List<Song> songLanguages = new List<Song>();
+    private Song selectedSong = new Song();
+    private Lyric selectedLyric = new Lyric();
+    private Stopwatch sw = new Stopwatch();
+
+    private string searchTerm = "";
+    private bool showSongInfo = false;
+    private bool isEditMode = false;
+    private bool songQueuesMode = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // FOR SECOND WINDOW
+        // https://stackoverflow.com/questions/2329978/the-calling-thread-must-be-sta-because-many-ui-components-require-this
+
+        await RefreshSongs().ConfigureAwait(false);
+    }
+
+    //[EVENTS]=====================================
+    private async Task OnInputQuery()
+    {
+        if (String.IsNullOrWhiteSpace(searchTerm))
+            await RefreshSongs().ConfigureAwait(false);
+        else if (searchTerm.StartsWith("."))
+            await RefreshSongs(await songService.QueryLyricAsync(searchTerm.Substring(1)).ConfigureAwait(false)).ConfigureAwait(false);
+        else if (searchTerm.StartsWith("*"))
+            await RefreshSongs(await songService.QueryAuthorAsync(searchTerm.Substring(1)).ConfigureAwait(false)).ConfigureAwait(false);
+        else if (searchTerm.StartsWith("#"))
+            await RefreshSongs(await songService.QueryTagsAsync(searchTerm.Substring(1)).ConfigureAwait(false)).ConfigureAwait(false);
+        else
+            await RefreshSongs(await songService.QueryTitleAsync(searchTerm).ConfigureAwait(false)).ConfigureAwait(false);
+
+    }
+    private async Task OnSongChange(Song song)
+    {
+        selectedSong = await songService.GetAsync(song.Id).ConfigureAwait(false);
+        selectedLyric = new Lyric();
+
+        if (!String.IsNullOrWhiteSpace(song.LyricText))
+            selectedSong.LyricText = selectedSong.LyricText.AddHighlight(song.LyricText);
+
+        await GetLanguages().ConfigureAwait(false);
+
+        // Scroll to Song
+        var index = songs.IndexOf(song);
+        await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "SongList", index).ConfigureAwait(false);
+
+        showSongInfo = true;
+    }
+    private async Task OnLyricChange(Lyric lyric)
+    {
+        selectedLyric = lyric;
+
+        await Task.Delay(1).ConfigureAwait(false);
+        await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "highlighted_lyric").ConfigureAwait(false);
+    }
+    private async Task OnSearchInputKeyDown(KeyboardEventArgs args)
+    {
+        if(songs.Count() != 0 && args.Key == "Enter")
+        {
+            await Task.Delay(100);
+            await OnSongChange(songs[0]).ConfigureAwait(false);
+            await jSRuntime.InvokeVoidAsync("SwitchFocusTo", "SongList").ConfigureAwait(false);
+        }
+    }
+
+    //[REFACTOR]=====================================
+    private async Task RefreshSongs(List<Song>? songList = null)
+    {
+        songs.Clear();
+        if (songList is null)
+            songs = await songService.GetAllAsync().ConfigureAwait(false);
+        else
+            songs = songList;
+    }
+    private async Task ToggleSongQueuesMode()
+    {
+        songQueuesMode = !songQueuesMode;
+
+        if (songQueuesMode)
+            await RefreshSongs(await songService.GetQueueAsync().ConfigureAwait(false)).ConfigureAwait(false);
+        else
+            await RefreshSongs().ConfigureAwait(false);
+    }
+    private async Task ClearQueue()
+    {
+        if (!songQueuesMode)
+            return;
+
+        foreach(var song in songs)
+        {
+            await AddRemoveSongFromQueue(song, false).ConfigureAwait(false);
+        }
+
+        await RefreshSongs(await songService.GetQueueAsync().ConfigureAwait(false)).ConfigureAwait(false);
+    }
+    private async Task AddRemoveSongFromQueue(Song song, bool canModifySongList = true)
+    {
+        var completeSong = await songService.GetAsync(song.Id).ConfigureAwait(false);
+
+        if (song.InQueue)
+        {
+            song.InQueue = false;
+            completeSong.InQueue = false;
+            completeSong.QueueOrder = 0;
+
+            if (songQueuesMode && canModifySongList)
+                songs.Remove(song);
+        }
+        else
+        {
+            var lastQueueOrderNumber = await songService.GetLastQueueOrderAsync().ConfigureAwait(false);
+
+            song.InQueue = true;
+            completeSong.InQueue = true;
+            completeSong.QueueOrder = lastQueueOrderNumber + 1;
+        }
+
+        await UpdateSong(completeSong).ConfigureAwait(false);
+    }
+    private async Task ToggleEditMode()
+    {
+        isEditMode = !isEditMode;
+        selectedLyric = new Lyric();
+
+        if (isEditMode)
+        {
+            selectedSong.LyricText = selectedSong.LyricText.RemoveHighlight();
+        }
+        else
+        {
+            await UpdateSong(selectedSong).ConfigureAwait(false);
+            await GetLanguages().ConfigureAwait(false);
+        }
+    }
+
+    //[SONG CRUD]=====================================
+    private async Task AddSong()
+    {
+        var number = await songService.GetLastNumberAsync().ConfigureAwait(false);
+        await songService.AddAsync(new Song(number + 1, "Title", "Author")).ConfigureAwait(false);
+
+        searchTerm = "";
+        await RefreshSongs().ConfigureAwait(false);
+
+        selectedSong = songs[songs.Count() - 1];
+        await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "SongList", songs.Count()).ConfigureAwait(false);
+    }
+    private async Task UpdateSong(Song song)
+    {
+        var songInList = songs.Find(s => s.Id == song.Id);
+        if (songInList is not null)
+        {
+            var index = songs.IndexOf(songInList!);
+            songs[index].Title = song.Title;
+            songs[index].Author = song.Author;
+        }
+
+        await songService.UpdateAsync(song).ConfigureAwait(false);
+    }
+    private async Task DeleteSong(Song song) 
+    { 
+        var index = songs.IndexOf(song);
+
+        if (selectedSong.Id == song.Id)
+            selectedSong = songs[Math.Max(index - 1, 0)];
+
+        await songService.DeleteAsync(song).ConfigureAwait(false);
+
+        if(songQueuesMode)
+            await RefreshSongs(await songService.GetQueueAsync().ConfigureAwait(false)).ConfigureAwait(false);
+        else
+            await OnInputQuery().ConfigureAwait(false);
+
+        if (songs.Count() == 0)
+            return;
+
+        await Task.Delay(1).ConfigureAwait(false);
+        selectedSong = songs[songs.Count - 1];
+        await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "SongList", songs.Count() - 1).ConfigureAwait(false);
+    }
+    private async Task AddLanguageToSong() => await songService.AddAsync(new Song(selectedSong.Number, "Title", "Author")).ConfigureAwait(false);
+    private async Task GetLanguages()
+    {
+        songLanguages.Clear();
+        songLanguages = await songService.GetLanguagesOfSongAsync(selectedSong.Number).ConfigureAwait(false);
+    }
+
+    private void HideSongInfo() => showSongInfo = false;
+}

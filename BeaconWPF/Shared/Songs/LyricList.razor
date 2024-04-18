@@ -1,0 +1,39 @@
+﻿@if(Lyrics is not null){
+    <div id="LyricList" tabindex="0" class="flex flex-col w-full h-full overflow-auto bg-gray rounded-xl scroll-gutter outline-0 gap-1"
+         @onkeydown="((args) => OnKeyDown(args))">
+        @foreach (var lyric in Lyrics)
+        {
+            var isSelected = lyric.Id == SelectedLyric!.Id;
+            <LyricItem Lyric="lyric" IsSelected="isSelected" OnItemClick="ChangeLyric"></LyricItem>
+        }
+
+    </div>
+}
+@code {
+    [Parameter] public List<Lyric>? Lyrics { get; set; }
+    [Parameter] public Lyric? SelectedLyric { get; set; }
+    [Parameter] public EventCallback<Lyric> OnLyricChanged { get; set; }
+
+    private async Task ChangeLyric(Lyric lyric) => await OnLyricChanged.InvokeAsync(lyric);
+
+    private DateTime lastKeyDownTime = DateTime.MinValue;
+    private async Task OnKeyDown(KeyboardEventArgs _args)
+    {
+        DateTime currentTime = DateTime.Now;
+        int timeElapsed = (currentTime - lastKeyDownTime).Milliseconds;
+        if (timeElapsed <= 150) return;
+        lastKeyDownTime = currentTime;
+
+        if (Lyrics is null && SelectedLyric is null || SelectedLyric!.Id == 0 || Lyrics!.Count == 0)
+            return;
+
+        var index = Lyrics!.IndexOf(Lyrics.Where(s => s.Id == SelectedLyric!.Id).First());
+
+        if (_args.Code == "ArrowUp")
+            await ChangeLyric(Lyrics[Math.Max(index - 1, 0)]);
+        else if (_args.Code == "ArrowDown")
+            await ChangeLyric(Lyrics[Math.Min(index + 1, Lyrics.Count() - 1)]);
+    }
+
+
+}

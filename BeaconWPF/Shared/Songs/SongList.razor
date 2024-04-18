@@ -1,0 +1,44 @@
+﻿@if(Songs is not null)
+{
+    <div id="SongList" tabindex="0" class="flex flex-col w-full h-full overflow-y-auto bg-gray rounded-xl scroll-gutter outline-0"
+         @onkeydown="((args) => OnKeyDown(args))">
+        <Virtualize Items="Songs" Context="song" OverscanCount="10" ItemSize="64">
+            @{
+                var isSelected = song.Id == SelectedSong!.Id;
+                <SongItem Song="song" OnItemClick="ChangeSong" IsSelected="isSelected"
+                          QueueToggle="AddRemoveSongFromQueueClick" DeleteSong="Delete"></SongItem>
+            }
+        </Virtualize>
+    </div>
+}
+@code {
+    [Parameter] public Song? SelectedSong{ get; set; }
+    [Parameter] public List<Song>? Songs { get; set; }
+    [Parameter] public EventCallback<Song> OnSongChanged { get; set; }
+    [Parameter] public EventCallback<Song> AddRemoveSongFromQueue { get; set; }
+    [Parameter] public EventCallback<Song> DeleteSong { get; set; }
+
+    private async Task ChangeSong(Song song) => await OnSongChanged.InvokeAsync(song);
+
+    private DateTime lastKeyDownTime = DateTime.MinValue;
+    private async Task OnKeyDown(KeyboardEventArgs _args)
+    {
+        DateTime currentTime = DateTime.Now;
+        int timeElapsed = (currentTime - lastKeyDownTime).Milliseconds;
+        if (timeElapsed <= 150) return;
+        lastKeyDownTime = currentTime;
+
+        if (Songs is null && SelectedSong is null || Songs!.Count == 0 || SelectedSong!.Id == 0)
+            return;
+
+        var index = Songs!.IndexOf(Songs.Where(s => s.Id == SelectedSong!.Id).First());
+
+        if (_args.Code == "ArrowUp")
+            await ChangeSong(Songs[Math.Max(index - 1, 0)]);
+        else if (_args.Code == "ArrowDown")
+            await ChangeSong(Songs[Math.Min(index + 1, Songs.Count() - 1)]);
+    }
+
+    private async Task AddRemoveSongFromQueueClick(Song song) => await AddRemoveSongFromQueue.InvokeAsync(song);
+    private async Task Delete(Song song) => await DeleteSong.InvokeAsync(song);
+}

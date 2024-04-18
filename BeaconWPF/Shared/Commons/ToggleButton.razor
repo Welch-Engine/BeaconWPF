@@ -1,0 +1,18 @@
+﻿<button class="px-6 py-3 border-[1px] rounded-xl @Css
+                @(IsChecked ? "bg-primary text-white" : "hover:bg-primary hover:bg-opacity-10 hover:text-white")" @onclick="Click">
+    <span class="mr-2 font-ark">@Icon</span> <span class="font-bold tracking-widest">@Message</span>
+</button>
+
+@code {
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public EventCallback<bool> OnClick { get; set; }
+    [Parameter] public string? Css { get; set; }
+    [Parameter] public bool IsChecked { get; set; }
+
+    private async Task Click()
+    {
+        IsChecked = !IsChecked;
+        await OnClick.InvokeAsync(IsChecked);
+    }
+}

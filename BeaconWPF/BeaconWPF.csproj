@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows7.0</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <UseWPF>true</UseWPF>
+		<PublishSingleFile>true</PublishSingleFile>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+
+		<Title>Beacon</Title>
+		<Author>Newt Welch</Author>
+		<Version>1.0.0</Version>
+		<PublisherName>Welch Engine</PublisherName>
+		<AssemblyTitle>Beacon</AssemblyTitle>
+		<AssemblyName>Welch Engine</AssemblyName>
+		
+		<!-- Project Options -->
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>BeaconWPF</RootNamespace>
+        <ApplicationIcon>Resources\Images\Main_ Ark.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Splash.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Resources\Images\Main_ Ark.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Shared\Commons\Button.razor" />
+      <None Include="Shared\Commons\ToggleButton.razor" />
+      <None Include="Shared\Songs\LyricItem.razor" />
+      <None Include="Shared\Songs\LyricList.razor" />
+      <None Include="Shared\Songs\SongItem.razor" />
+      <None Include="Shared\Songs\SongList.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AsyncAwaitBestPractices" Version="7.0.0" />
+        <PackageReference Include="Majorsoft.Blazor.Components.Debounce" Version="1.5.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="8.*" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.*" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <SplashScreen Include="Resources\Images\Splash.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Update="wwwroot\css\app.css">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Update="wwwroot\index.html">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+</Project>

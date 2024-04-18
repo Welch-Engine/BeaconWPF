@@ -1,0 +1,20 @@
+﻿@if(Lyric is not null){
+    <div class="relative border-gray_1 border-[1px] flex rounded-xl h-fit w-full cursor-pointer
+                @(IsSelected ? "bg-primary text-white highlighted_lyric" : "hover:bg-primary hover:bg-opacity-10 hover:text-white")"
+         @onclick="(async () => await ItemClick())">
+        <p class="absolute top-3 left-3 tracking-widest">@Lyric.Line</p>
+    
+        <p class="w-full p-3 text-center whitespace-pre-line bg-opacity-25 bg-gray_dark text-wrap text-sm">
+            @((MarkupString)Lyric.Text)
+        </p>
+    
+    </div>
+}
+
+@code {
+    [Parameter] public Lyric? Lyric { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public EventCallback<Lyric> OnItemClick { get; set; }
+
+    private async Task ItemClick() => await OnItemClick.InvokeAsync(Lyric);
+}

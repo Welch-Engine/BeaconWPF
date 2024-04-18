@@ -1,0 +1,95 @@
+﻿@page "/BibleLibrary"
+@inject IBibleService bibleService
+
+<div class="absolute top-0 left-0 hidden w-16 h-full bg-gray_2 -z-10 md:block"> </div>
+
+<div class="relative flex w-full h-full overflow-x-hidden">
+
+    <!-- BOOKS -->
+    <div class="z-10 flex flex-col self-start w-full h-full gap-3 p-3 bg-gray_2 rounded-r-3xl md:min-w-56 md:w-56">
+        <ToggleButton Icon="L" Message="VIEW QUEUE" Css="border-gray_1 px-6 py-3 "></ToggleButton>
+        <DebounceInput type="text" class="w-full h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Book" DebounceTime="200" />
+
+        <div class="flex flex-col w-full h-full overflow-y-auto bg-gray rounded-xl scroll-gutter outline-0">
+            @foreach(var book in books)
+            {
+                <div class="flex items-center min-h-16 -mx-[5px] p-4 rounded-xl text-sm leading-5 line-clamp-1">@book.Name</div>
+            }
+        </div>
+
+    </div>
+
+
+    <!-- CHAPTERS -->
+    <div class="z-10 flex flex-col self-start w-full h-full gap-3 p-3 rounded-r-3xl md:min-w-40 md:w-40">
+        
+        <ToggleButton Icon="M.A" Message="NEWT" Css="invisible pointer-events-none"></ToggleButton>
+
+        <DebounceInput type="text" class="w-full h-16 p-4 text-sm bg-black border-0 rounded-xl" placeholder="Chapter" DebounceTime="200"/>
+
+        <div class="flex flex-col w-full h-full overflow-y-auto bg-gray rounded-xl scroll-gutter outline-0">
+            @foreach (var chapter in chapters)
+            {
+                <div class="flex items-center min-h-16 -mx-[5px] p-4 rounded-xl text-sm leading-5 line-clamp-1">@chapter.Id</div>
+            }
+        </div>
+    </div>
+
+    <!-- UNO BACKGROUND GRAY 3 -->
+    <div class="absolute w-full h-40 bg-gray_3 bg-opacity-75 -z-0"></div>
+
+    <!-- DOS BACKGROUND GRAY 3 -->
+    <div class="absolute w-96 rounded-r-3xl h-full bg-gray_3 -z-0"></div>
+
+
+    <div class="flex flex-col w-full bg-red h-full z-20 overflow-x-auto">
+
+        <div class="flex items-center justify-between w-full h-40 px-10 bg-gray_3">
+
+        </div>
+
+        <div class="flex  w-full h-full py-1 overflow-y-hidden bg-black">
+
+            <div tabindex="0" class="flex flex-col w-full gap-2 p-1 overflow-y-auto scroll-auto">
+                @foreach (var verse in verses)
+                {
+                    <div class="border-gray_1 border-[1px] flex rounded-xl min-h-fit w-full cursor-pointer">
+                        <p class="w-full p-6 whitespace-pre-line bg-opacity-25 bg-gray_dark text-wrap text-sm">
+                            @verse.Verse. @((MarkupString)verse.Text)
+                        </p>
+                    </div>
+                }
+            </div>
+
+            <div tabindex="0" class="flex-col w-full gap-2 p-1 overflow-y-auto flex">
+                @foreach (var verse in verses)
+                {
+                    <div class="border-gray_1 border-[1px] flex rounded-xl min-h-fit w-full cursor-pointer">
+                        <p class="w-full p-6 whitespace-pre-line bg-opacity-25 bg-gray_dark text-wrap text-sm">
+                            @verse.Verse. @((MarkupString)verse.Text)
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    private List<Book> books = new List<Book>();
+    private List<Chapter> chapters = new List<Chapter>();
+    private List<BeaconVerse> verses = new List<BeaconVerse>();
+
+    private Book selectedBook = new Book();
+    private Chapter selectedChapter = new Chapter();
+    private BeaconVerse selectedVerse = new BeaconVerse();
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await bibleService.GetBooksAsync("kjv").ConfigureAwait(false);
+        chapters = await bibleService.GetChaptersAsync("kjv", 1).ConfigureAwait(false);
+        verses = await bibleService.GetVersesAsync("kjv", 1, 1).ConfigureAwait(false);
+    }
+}

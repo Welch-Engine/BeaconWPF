@@ -1,0 +1,47 @@
+﻿<div class="flex items-center min-h-16 -mx-[5px] justify-between p-3 group rounded-xl gap-3
+            @(IsSelected ? "bg-primary text-white highlighted_song" :
+                           "hover:text-white hover:bg-primary hover:bg-opacity-10")
+            hover:cursor-pointer"
+            @onclick="(async () => await ItemClick())">
+     <div class="flex flex-col">
+        <p class="text-sm leading-5 line-clamp-1">
+            @((MarkupString)Song!.Title)
+        </p>
+
+        <p class="text-xs line-clamp-1 @(IsSelected ? "opacity-75" : "opacity-40 group-hover:opacity-75")">
+            @if (!String.IsNullOrWhiteSpace(Song.LyricText))
+            {
+                var spanStart = "<span class=\"text-orange group-hover:text-white_light\">";
+                var spanEnd = "</span>";
+                @((MarkupString)$" {Song!.LyricText.Replace("<b>", spanStart).Replace("</b>", spanEnd)} ")
+            }
+            else if(!String.IsNullOrWhiteSpace(Song.Tags))
+            {
+                @((MarkupString)Song!.Tags)
+            }
+            else
+            {
+                @((MarkupString)Song!.Author)
+            }
+        </p>
+
+    </div>
+
+    <div class="gap-3 text-base @(IsSelected ? "flex" : Song.InQueue ? "flex" : "hidden group-hover:flex")">
+        <Button Icon="@(Song.InQueue ? "R" : "A")" Css="@(IsSelected ? "hover:opacity-50" : "hover:text-primary")"
+                OnClick="QueueClick"></Button>
+        <Button Icon="D" Css="@(IsSelected ? "hover:text-red" : "invisible group-hover:visible hover:text-red")" OnClick="DeleteClick"></Button>
+    </div>
+
+</div>
+@code {
+    [Parameter] public Song? Song { get; set; }
+    [Parameter] public bool IsSelected {get; set;}
+    [Parameter] public EventCallback<Song> OnItemClick { get; set; }
+    [Parameter] public EventCallback<Song> DeleteSong { get; set; }
+    [Parameter] public EventCallback<Song> QueueToggle { get; set; }
+
+    private async Task ItemClick() => await OnItemClick.InvokeAsync(Song);
+    private async Task QueueClick() => await QueueToggle.InvokeAsync(Song);
+    private async Task DeleteClick() => await DeleteSong.InvokeAsync(Song);
+}

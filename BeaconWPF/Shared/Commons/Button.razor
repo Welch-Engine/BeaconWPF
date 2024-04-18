@@ -1,0 +1,14 @@
+﻿<button class="bg-gray_@Background rounded-xl @Css" @onclick="Click" @onclick:stopPropagation="true">
+    <span class="@(HasIconMargin ? "mr-2" : "") font-ark">@Icon</span> <span class="font-bold tracking-widest">@Message</span>
+</button>
+
+@code {
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string? Background { get; set; }
+    [Parameter] public string? Css { get; set; }
+    [Parameter] public bool HasIconMargin { get; set; } = true;
+
+    private async Task Click() => await OnClick.InvokeAsync();
+}
