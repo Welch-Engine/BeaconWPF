@@ -16,9 +16,9 @@ jobs:
         - uses: actions/checkout@v3
 
         - name: Get Version from Project File
-        id: get-version
-        shell: bash
-        run: echo "version=$(grep -oE '<Version>[^<]+' BeaconWPF/BeaconWPF.csproj | sed 's/<Version>//')" >> $GITHUB_OUTPUT
+          id: get-version
+          shell: bash
+          run: echo "version=$(grep -oE '<Version>[^<]+' BeaconWPF/BeaconWPF.csproj | sed 's/<Version>//')" >> $GITHUB_OUTPUT
 
         - uses: actions/setup-dotnet@v3
           with: 
@@ -30,12 +30,12 @@ jobs:
   
         - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x64 -p:PublishSingleFile=true -p:AssemblyName=Beacon -p:IncludeAllContentForSelfExtract=true -o .\publish
         
-          - name: Create Velopack Release
-        run: |
-          dotnet tool install -g vpk
-          vpk download github --repoUrl https://github.com/Welch-Engine/BeaconWPF
-          vpk pack -u MyUniqueIdentifier -v ${{ steps.get-version.outputs.version }} -p publish
-          vpk upload github --repoUrl https://github.com/Welch-Engine/BeaconWPF --publish --releaseName "MyProject ${{ steps.get-version.outputs.version }}" --tag v${{ steps.get-version.outputs.version }}
+        - name: Create Velopack Release
+          run: |
+            dotnet tool install -g vpk
+            vpk download github --repoUrl https://github.com/Welch-Engine/BeaconWPF
+            vpk pack -u MyUniqueIdentifier -v ${{ steps.get-version.outputs.version }} -p publish
+            vpk upload github --repoUrl https://github.com/Welch-Engine/BeaconWPF --publish --releaseName "MyProject ${{ steps.get-version.outputs.version }}" --tag v${{ steps.get-version.outputs.version }}
 
         
         # - uses: actions/create-release@v1
