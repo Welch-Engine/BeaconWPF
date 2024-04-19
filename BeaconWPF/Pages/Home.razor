@@ -3,60 +3,109 @@
 @using Velopack
 @using Velopack.Sources
 
-<div>
-    @status
-    <br/>
-    @availableVersion
+<div class="flex w-full h-full">
+
+    <div class="flex relative w-full h-full">
+
+        <!-- WHEN NEW UPDATE IS FOUND -->
+        @if (newUpdateAvailable && updateManager is not null)
+        {
+            <div class="absolute w-full h-fit p-3 cursor-pointer">
+                <div class="flex w-full h-full  rounded-xl px-6 py-3 border-[1px] border-gray_1
+                            @(isDownloadingNewVersion ? (updateManager.IsUpdatePendingRestart ? "bg-primary text-white" 
+                                                                                    : "bg-primary bg-opacity-20") 
+                                                      : "from-primary/20 hover:from-primary hover:text-white bg-gradient-to-r to-black transition-all duration-500")">
+                    
+                    @if (isDownloadingNewVersion && !updateManager.IsUpdatePendingRestart)
+                    {
+                        <div class="flex flex-col w-full">
+                            <h1 class="text-white font-bold text-lg tracking-widest">DOWNLOADING...</h1>
+                            <div class="bg-primary h-2.5 rounded-xl" style="width: @updateBarProgress%"></div>
+                        </div>
+                    }
+                    else if (updateManager.IsUpdatePendingRestart)
+                    {
+                        <div class="flex flex-col w-full" @onclick="ApplyUpdatesAndRestart">
+                            <h1 class="text-white font-bold text-lg tracking-widest">CLICK TO RESTART AND APPLY UPDATES...</h1>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="flex flex-col w-full" @onclick="DownloadNewUpdate">
+                            <h1 class="text-white font-bold text-lg tracking-widest">NEW UPDATE!</h1>
+                            <p>A new version of BEACON has been found</p>
+                        </div>
+                        <div class="text-right w-full self-center">
+                                NEW VERSION - @newVersion
+                        </div>
+                    }
+                    
+                </div>
+            </div>
+        }
+
+    </div>
+
 </div>
 
 @code{
 
-    private UpdateManager _um;
-    private UpdateInfo _update;
+    private UpdateManager? updateManager;
+    private UpdateInfo? newUpdate;
 
-    private string status = "";
-    private string availableVersion = "";
+    private string newVersion = "";
+
+    private bool newUpdateAvailable = false;
+    private bool isDownloadingNewVersion = false;
+
+    private int updateBarProgress = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        _um = new UpdateManager(new GithubSource("https://github.com/Welch-Engine/BeaconWPF", "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", false));
-
-        // if (_um.IsInstalled)
-        // {
-        //     // check for new version
-        //     var newVersion = await _um.CheckForUpdatesAsync();
-
-        //     if (newVersion == null)
-        //         return; // no update available
-
-        //     availableVersion = newVersion.TargetFullRelease.Version.Major.ToString() + newVersion.TargetFullRelease.Version.Minor.ToString() + newVersion.TargetFullRelease.Version.Patch.ToString();
-        // }
-
-        UpdateStatus();
+        await CheckForUpdate().ConfigureAwait(false);
     }
 
-    private void UpdateStatus()
+    private void Progress(int percent)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"Velopack version: {VelopackRuntimeInfo.VelopackNugetVersion}");
-        sb.AppendLine($"This app version: {(_um.IsInstalled ? _um.CurrentVersion : "(n/a - not installed)")}");
+        InvokeAsync(() => 
+                    { 
+                        updateBarProgress = percent;
+                        StateHasChanged();
+                    });
+    }
 
-        if (_update != null)
+    private async Task DownloadNewUpdate()
+    {
+        try
         {
-            sb.AppendLine($"Update available: {_update.TargetFullRelease.Version}");
-        }
-        else
-        {
-        }
+            isDownloadingNewVersion = true;
 
-        if (_um.IsUpdatePendingRestart)
-        {
-            sb.AppendLine("Update ready, pending restart to install");
+            if (updateManager is not null && newUpdate is not null) 
+                await updateManager.DownloadUpdatesAsync(newUpdate, Progress).ConfigureAwait(false);
         }
-        else
+        catch (Exception ex)
         {
+            var a = ex;
         }
+    }
 
-        status = sb.ToString();
+    private void ApplyUpdatesAndRestart()
+    {
+        if(updateManager is not null && newUpdate is not null)
+            updateManager.ApplyUpdatesAndRestart(newUpdate);
+    }
+
+    private async Task CheckForUpdate()
+    {
+        updateManager = new UpdateManager(new GithubSource("https://github.com/Welch-Engine/BeaconWPF", "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", false));
+
+        if (updateManager is null || !updateManager.IsInstalled) return;
+
+        newUpdate = await updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
+
+        if (newUpdate == null) return;
+
+        newUpdateAvailable = true;
+        newVersion = newUpdate.TargetFullRelease.Version.ToString();
     }
 }

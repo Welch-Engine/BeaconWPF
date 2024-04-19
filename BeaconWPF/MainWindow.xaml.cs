@@ -2,6 +2,8 @@
 using BeaconWPF.Data.Helpers;
 using System.Windows;
 using System.Windows.Interop;
+using Velopack;
+using Velopack.Sources;
 
 namespace BeaconWPF
 {
@@ -23,6 +25,9 @@ namespace BeaconWPF
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
 
+            // APP TITLE WITH VERSION
+            var updateManager = new UpdateManager(new GithubSource("https://github.com/Welch-Engine/BeaconWPF", "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", false));
+            AppTitle.Text = $"Beacon {(updateManager.IsInstalled ? updateManager.CurrentVersion : "(DEV MODE)")}";
 
             //!? ====================================================
             //!? INIT: Window Buttons

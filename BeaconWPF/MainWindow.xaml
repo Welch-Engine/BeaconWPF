@@ -33,7 +33,7 @@
                 <!--  Logo : ARK! -->
                     <Image x:Name="Logo" Height="20" Margin="15 5 5 5"
                            Source="Resources/Images/Main_ Ark.ico" />
-                    <TextBlock Text="Beacon 1.0.0" FontFamily="Gontserrat" Foreground="#9A989A"
+                    <TextBlock x:Name="AppTitle"  FontFamily="Gontserrat" Foreground="#9A989A"
                                FontSize="14" VerticalAlignment="Center" Margin="5 0 0 0"/>
                     <!-- CLOSE : close the app -->
                     <Button x:Name="CloseButton" Style="{StaticResource WindowButton}"

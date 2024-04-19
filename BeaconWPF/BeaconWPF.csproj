@@ -12,11 +12,11 @@
 
 		<Title>Beacon</Title>
 		<Author>Newt Welch</Author>
-		<Version>0.0.2</Version>
+		<Version>0.1.0</Version>
 		<PublisherName>Welch Engine</PublisherName>
 		<AssemblyTitle>Beacon</AssemblyTitle>
 		<AssemblyName>Beacon</AssemblyName>
-		<AssemblyVersion>0.0.2</AssemblyVersion>
+		<AssemblyVersion>0.1.0</AssemblyVersion>
 		
 		<StartupObject>BeaconWPF.Program</StartupObject>
 		
