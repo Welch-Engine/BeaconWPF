@@ -1,0 +1,50 @@
+﻿<div tabindex="0" class="relative flex border-[1px] rounded-xl border-gray_1 cursor-pointer @Css"
+     onclick="@(() =>{ showOptions = !showOptions; })" onblur="@(() =>{ showOptions = false; })">
+    <p class="px-6 py-3 w-full h-fit truncate overflow-hidden">@SelectedOption</p>
+    <div class="flex-1 h-full w-fit bg-gray_1 rounded-xl px-3 flex items-center">
+        <svg width="13px" height="8px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+        <g transform="matrix(1,0,0,1,-2159.69,-37.298)">
+        <g transform="matrix(0.0385476,0,0,0.0385476,2159.69,26.2001)">
+        <path d="M182.6,470.6C170.1,483.1 149.8,483.1 137.3,470.6L9.3,342.6C0.1,333.4 -2.6,319.7 2.4,307.7C7.4,295.7 19,287.9 32,287.9L288,287.9C300.9,287.9 312.6,295.7 317.6,307.7C322.6,319.7 319.8,333.4 310.7,342.6L182.7,470.6L182.6,470.6Z" style="fill:rgb(154,152,154);fill-rule:nonzero;" />
+                        </g>
+                    </g>
+                </svg>
+    </div>
+
+    @if(showOptions){
+        <div class="absolute flex flex-col w-full min-h-fit max-h-32 bg-gray_1 overflow-auto rounded-xl mt-11">
+            @foreach(var option in Options)
+            {
+                <div class="hover:text-white hover:bg-primary hover:bg-opacity-20 rounded-xl px-6 py-3 cursor-pointer"
+                     onclick="@(async () => { await OptionClicked(option.Item1, option.Item2); })">
+                    @option.Item2
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+@code {
+    //ITEM 1 = VALUE, ITEM 2 = DISPLAYSTRING
+    [Parameter] public List<Tuple<string, string>> Options { get; set; } = new List<Tuple<string, string>>();
+    [Parameter] public string SelectedOption { get; set; } = "";
+    [Parameter] public string Css { get; set; } = "";
+    [Parameter] public EventCallback<string> OnOptionChange { get; set; }
+
+    private bool showOptions;
+
+    protected override void OnParametersSet()
+    {
+        if (String.IsNullOrWhiteSpace(SelectedOption) && Options.Count() != 0)
+        {
+            SelectedOption = Options[0].Item2;
+        }
+    }
+
+    public async Task OptionClicked(string value, string display)
+    {
+        SelectedOption = display;
+        await OnOptionChange.InvokeAsync(value).ConfigureAwait(false);
+    }
+}

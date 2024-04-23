@@ -18,8 +18,8 @@ namespace BeaconWPF.Data.Bibles
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
-        [JsonPropertyName("translation")]
-        public string Translation { get; set; } = "";
+        [JsonPropertyName("language")]
+        public string Language { get; set; } = "";
         [JsonPropertyName("abbreviation")]
         public string Abbreviation { get; set; } = "";
         [JsonPropertyName("description")]

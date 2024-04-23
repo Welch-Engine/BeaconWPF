@@ -16,6 +16,7 @@ namespace BeaconWPF.Data.Bibles
             httpClient = factory.GetClient();
             CreateTable().SafeFireAndForget();
         }
+        public async Task CreateTable() => await dbConnection.CreateTableAsync<Bible>().ConfigureAwait(false);
 
         public async Task<List<Book>> GetBooksAsync(string translation, bool useEnglish = false)
             => useEnglish ? await dbConnection.QueryAsync<Book>($"SELECT * FROM kjvBooks").ConfigureAwait(false) :
@@ -27,7 +28,7 @@ namespace BeaconWPF.Data.Bibles
         public async Task<List<BeaconVerse>> GetVersesAsync(string translation, int book, int chapter)
             => await dbConnection.QueryAsync<BeaconVerse>($"SELECT * FROM {translation} WHERE Book = {book} AND Chapter = {chapter}").ConfigureAwait(false);
 
-        public async Task CreateTable() => await dbConnection.CreateTableAsync<Bible>().ConfigureAwait(false);
+        public async Task<List<Bible>> GetBiblesAsync() => await dbConnection.QueryAsync<Bible>("SELECT * FROM Bibles");
 
         public async Task DownloadBible(string translation)
         {
@@ -83,10 +84,10 @@ namespace BeaconWPF.Data.Bibles
     public interface IBibleService
     {
         public Task<Bible> GetAPIBibleAsync(string translation);
+        public Task<List<Bible>> GetBiblesAsync();
         public Task<List<Book>> GetBooksAsync(string translation, bool useEnglish = false);
         public Task<List<Chapter>> GetChaptersAsync(string translation, int book);
         public Task<List<BeaconVerse>> GetVersesAsync(string translation, int book, int chapter);
-
         public Task DownloadBible(string translation);
     }
 }

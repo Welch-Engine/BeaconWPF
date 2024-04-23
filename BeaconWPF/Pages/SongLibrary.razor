@@ -170,6 +170,7 @@
     private async Task RefreshSongs(List<Song>? songList = null)
     {
         songs.Clear();
+
         if (songList is null)
             songs = await songService.GetAllAsync().ConfigureAwait(false);
         else

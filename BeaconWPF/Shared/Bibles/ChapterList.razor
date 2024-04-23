@@ -1,0 +1,42 @@
+﻿@if (Chapters is not null)
+{
+    <div class="flex flex-col w-full h-full overflow-y-auto bg-gray rounded-xl scroll-gutter outline-0">
+        @foreach (var chapter in Chapters)
+        {
+            var isSelected = SelectedChapter!.Id == chapter.Id;
+
+            <div class="flex items-center min-h-16 -mx-[5px] p-4 rounded-xl text-sm leading-5 line-clamp-1 cursor-pointer
+                        @(isSelected ? "bg-primary text-white" : "hover:bg-primary hover:text-white hover:bg-opacity-10")"
+                 @onclick="(async () => await ChangeChapter(chapter))">
+                @chapter.Id
+            </div>
+        }
+    </div>
+
+}
+@code {
+    [Parameter] public Chapter? SelectedChapter { get; set; } = new Chapter();
+    [Parameter] public List<Chapter>? Chapters { get; set; }
+    [Parameter] public EventCallback<Chapter> OnChapterChanged { get; set; }
+
+    private async Task ChangeChapter(Chapter chapter) => await OnChapterChanged.InvokeAsync(chapter);
+
+    private DateTime lastKeyDownTime = DateTime.MinValue;
+    private async Task OnKeyDown(KeyboardEventArgs _args)
+    {
+        DateTime currentTime = DateTime.Now;
+        int timeElapsed = (currentTime - lastKeyDownTime).Milliseconds;
+        if (timeElapsed <= 150) return;
+        lastKeyDownTime = currentTime;
+
+        if (Chapters is null && SelectedChapter is null || Chapters!.Count == 0 || SelectedChapter!.Id == 0)
+            return;
+
+        var index = Chapters!.IndexOf(Chapters.Where(s => s.Id == SelectedChapter!.Id).First());
+
+        if (_args.Code == "ArrowUp")
+            await ChangeChapter(Chapters[Math.Max(index - 1, 0)]);
+        else if (_args.Code == "ArrowDown")
+            await ChangeChapter(Chapters[Math.Min(index + 1, Chapters.Count() - 1)]);
+    }
+}
