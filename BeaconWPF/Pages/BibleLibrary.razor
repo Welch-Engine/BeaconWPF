@@ -1,9 +1,10 @@
 ﻿@page "/BibleLibrary"
 @inject IBibleService bibleService
+@inject IJSRuntime jSRuntime
 
 <div class="absolute top-0 left-0 hidden w-16 h-full bg-gray_2 -z-10 md:block"> </div>
 
-<div class="absolute w-full h-40  bg-gradient-to-r from-gray_1/10 to-gray_1 -z-0"></div>
+<div class="absolute w-full h-40  bg-gradient-to-r from-black to-gray_2 -z-0"></div>
 
 <div class="relative flex w-full h-full overflow-x-hidden">
 
@@ -34,9 +35,12 @@
 
         <div class="flex flex-col gap-3 w-full px-3 py-3">
             
-            <div class="flex w-full gap-3">
-                <Dropdown Options="bibles" OnOptionChange="OnDoubleViewBibleChange" Css="@(showDoubleViewOptions ? "" : "invisible pointer-events-none")"></Dropdown>
+            <div class="flex flex-row-reverse w-full gap-3 ">
                 <ToggleButton Icon="P" Message="DOUBLE VIEW" Css="@(showDoubleViewOptions ? "border-gray_1" : "invisible pointer-events-none")" IsChecked="doubleViewMode" OnClick="OnDoubleViewModeToggle" />
+                @if (doubleViewMode)
+                {
+                    <Dropdown Options="bibles" OnOptionChange="OnDoubleViewBibleChange" Css="@(showDoubleViewOptions ? "" : "invisible pointer-events-none")"></Dropdown>
+                }
             </div>
 
             <div class="flex w-full gap-3 justify-between">
@@ -50,30 +54,12 @@
 
         <div class="flex w-full h-full py-1 px-1 overflow-y-hidden bg-black">
 
-            <div tabindex="0" class="flex flex-col w-full gap-2 overflow-y-auto scroll-auto">
-                @foreach (var verse in verses)
-                {
-                    <div class="border-gray_1 border-[1px] flex rounded-xl min-h-fit w-full cursor-pointer">
-                        <p class="w-full p-6 whitespace-pre-line bg-opacity-25 bg-gray_dark text-wrap text-sm">
-                            @verse.Verse. @((MarkupString)verse.Text)
-                        </p>
-                    </div>
-                }
-            </div>
+            <VerseList Id="VerseList1" Verses="verses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, true))"/>
 
-            @if (doubleViewMode)
-            {
-                <div tabindex="0" class="flex-col w-full gap-2 overflow-y-auto flex">
-                    @foreach (var verse in doubleViewVerses)
-                    {
-                        <div class="border-gray_1 border-[1px] flex rounded-xl min-h-fit w-full cursor-pointer">
-                            <p class="w-full p-6 whitespace-pre-line bg-opacity-25 bg-gray_dark text-wrap text-sm">
-                                @verse.Verse. @((MarkupString)verse.Text)
-                            </p>
-                        </div>
-                    }
-                </div>
+            @if(doubleViewMode){
+                <VerseList Id="VerseList2" Verses="doubleViewVerses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, false))" />
             }
+
         </div>
 
     </div>
@@ -160,7 +146,26 @@
         doubleViewVerses.Clear();
         doubleViewVerses = await bibleService.GetVersesAsync(selectedDoubleViewBible, selectedBook.Id, selectedChapter.Id).ConfigureAwait(false);
     }
+    private async Task OnVerseChange(BeaconVerse verse, bool isMain)
+    {
+        selectedVerse = verse;
 
+        await Task.Delay(1).ConfigureAwait(false);
+
+        //HACKY SOLUTION BUT IT WORKS
+        if (isMain)
+        {
+            await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList1").ConfigureAwait(false);
+            await Task.Delay(300).ConfigureAwait(false);
+            await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList2").ConfigureAwait(false);
+        }
+        else
+        {
+            await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList2").ConfigureAwait(false);
+            await Task.Delay(300).ConfigureAwait(false);
+            await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList1").ConfigureAwait(false);
+        }
+    }
 
     private async Task GetBooksFromBible(string bible = "")
     {

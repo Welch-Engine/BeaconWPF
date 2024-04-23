@@ -31,7 +31,7 @@
         if (Books is null && SelectedBook is null || Books!.Count == 0 || SelectedBook!.Id == 0)
             return;
 
-        var index = Books!.IndexOf(Books.Where(s => s.Id == SelectedBook!.Id).First());
+        var index = Books!.IndexOf(Books.Where(b => b.Id == SelectedBook!.Id).First());
 
         if (_args.Code == "ArrowUp")
             await ChangeBook(Books[Math.Max(index - 1, 0)]);

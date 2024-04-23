@@ -154,7 +154,7 @@
         selectedLyric = lyric;
 
         await Task.Delay(1).ConfigureAwait(false);
-        await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "highlighted_lyric").ConfigureAwait(false);
+        await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "highlighted_lyric", "LyricList").ConfigureAwait(false);
     }
     private async Task OnSearchInputKeyDown(KeyboardEventArgs args)
     {

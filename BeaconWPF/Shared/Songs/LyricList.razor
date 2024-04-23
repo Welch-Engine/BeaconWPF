@@ -27,7 +27,7 @@
         if (Lyrics is null && SelectedLyric is null || SelectedLyric!.Id == 0 || Lyrics!.Count == 0)
             return;
 
-        var index = Lyrics!.IndexOf(Lyrics.Where(s => s.Id == SelectedLyric!.Id).First());
+        var index = Lyrics!.IndexOf(Lyrics.Where(l => l.Id == SelectedLyric!.Id).First());
 
         if (_args.Code == "ArrowUp")
             await ChangeLyric(Lyrics[Math.Max(index - 1, 0)]);

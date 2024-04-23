@@ -1,0 +1,44 @@
+﻿@if (Verse is not null)
+{
+    <div class="border-gray_1 border-[1px] flex rounded-xl min-h-fit w-full cursor-pointer outline-0
+                                                @(IsSelected ? "bg-primary text-white selected_Verse" : "hover:text-white hover:bg-primary hover:bg-opacity-20")
+                                                @(IsAlsoSelectedVerse ? "selected_Verse bg-primary bg-opacity-20" : "")"
+         @onclick="ItemClick">
+        <p tabindex="0" @onkeydown="OnKeyDown" class="w-full p-6  bg-opacity-25 bg-gray_dark text-wrap text-sm outline-0">
+            <span>@Verse.Verse.&nbsp;</span>
+            @if (IsSelected && VersePortions is not null)
+            {
+                foreach (var portion in VersePortions)
+                {
+                    var isSelected = portion.Item1 == SelectedPortion!.Item1 && portion.Item2 == SelectedPortion.Item2;
+
+                    <span class="bg-gray_2 cursor-pointer p-2 rounded-xl m-1 leading-10
+                                     @(isSelected ? "text-orange bg-opacity-100" : "hover:bg-opacity-100 bg-opacity-75")"
+                          @onclick="(async () => { await ItemPortionClick(portion); })" @onclick:stopPropagation="true">@portion.Item2&nbsp;
+                    </span>
+                }
+            }
+            else
+            {
+                <span>@((MarkupString)Verse.Text)</span>
+            }
+        </p>
+    </div>
+}
+
+@code {
+    [Parameter] public BeaconVerse? Verse { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public bool IsAlsoSelectedVerse { get; set; } // For scrolling with double view
+    [Parameter] public EventCallback<KeyboardEventArgs> OnPortionKeyDown { get; set; }
+    [Parameter] public EventCallback<BeaconVerse> OnItemClick { get; set; }
+
+    [Parameter] public EventCallback<Tuple<int, string>> OnItemPortionClick { get; set; }
+    [Parameter] public List<Tuple<int, string>>? VersePortions { get; set; }
+    [Parameter] public Tuple<int, string>? SelectedPortion { get; set; }
+
+    private async Task ItemClick() => await OnItemClick.InvokeAsync(Verse);
+    private async Task ItemPortionClick(Tuple<int, string> portion) => await OnItemPortionClick.InvokeAsync(portion);
+    private async Task OnKeyDown(KeyboardEventArgs args) => await OnPortionKeyDown.InvokeAsync(args);
+
+}

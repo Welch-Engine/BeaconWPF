@@ -32,7 +32,7 @@
         if (Chapters is null && SelectedChapter is null || Chapters!.Count == 0 || SelectedChapter!.Id == 0)
             return;
 
-        var index = Chapters!.IndexOf(Chapters.Where(s => s.Id == SelectedChapter!.Id).First());
+        var index = Chapters!.IndexOf(Chapters.Where(c => c.Id == SelectedChapter!.Id).First());
 
         if (_args.Code == "ArrowUp")
             await ChangeChapter(Chapters[Math.Max(index - 1, 0)]);
