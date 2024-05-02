@@ -12,7 +12,8 @@
     <div class="z-10 flex flex-col self-start w-full h-full gap-3 p-3 bg-gray_2 rounded-r-3xl md:min-w-56 md:w-56">
         
         <Dropdown Options="bibles" OnOptionChange="OnBibleChange"></Dropdown>
-        <DebounceInput type="text" class="w-full h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Book" DebounceTime="200" />
+        <DebounceInput id="BookSearchInput" type="text" class="w-full h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Book" DebounceTime="200"
+                       @bind-Value="bookSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnBookInputQuery" @onkeydown="OnBookSearchInputKeyDown" />
 
         <BookList Books="books" SelectedBook="selectedBook" OnBookChanged="OnBookChange"></BookList>
     </div>
@@ -22,7 +23,8 @@
     <div class="z-10 flex flex-col self-start w-full h-full gap-3 p-3 rounded-r-3xl md:min-w-40 md:w-40">
         
         <ToggleButton Icon="M.A" Message="NEWT" Css="invisible pointer-events-none"></ToggleButton>
-        <DebounceInput type="text" class="w-full h-16 p-4 text-sm bg-black border-0 rounded-xl" placeholder="Chapter" DebounceTime="200"/>
+        <DebounceInput id="ChapterSearchInput" type="text" class="w-full h-16 p-4 text-sm bg-black border-0 rounded-xl" placeholder="Chapter" DebounceTime="400"
+                       @bind-Value="chapterSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnChapterInputQuery" />
 
         <ChapterList Chapters="chapters" SelectedChapter="selectedChapter" OnChapterChanged="OnChapterChange"/>
     </div>
@@ -45,7 +47,8 @@
 
             <div class="flex w-full gap-3 justify-between">
 
-                <DebounceInput type="text" class="w-20 h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Verse" DebounceTime="200" />
+                <DebounceInput id="VerseSearchInput" type="text" class="w-20 h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Verse" DebounceTime="200"
+                               @bind-Value="verseSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnVerseInputQuery"/>
                 <DebounceInput type="text" class="w-1/2 h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Bible Search" DebounceTime="200" />
 
             </div>
@@ -54,10 +57,12 @@
 
         <div class="flex w-full h-full py-1 px-1 overflow-y-hidden bg-black">
 
-            <VerseList Id="VerseList1" Verses="verses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, true))"/>
+            <VerseList Id="VerseList1" Verses="verses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, true))"
+                        VersePortions="versePortions" SelectedPortion="selectedPortion"/>
 
             @if(doubleViewMode){
-                <VerseList Id="VerseList2" Verses="doubleViewVerses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, false))" />
+                <VerseList Id="VerseList2" Verses="doubleViewVerses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, false))"
+                           VersePortions="versePortions" SelectedPortion="selectedPortion" />
             }
 
         </div>
@@ -73,11 +78,17 @@
     private List<BeaconVerse> doubleViewVerses = new List<BeaconVerse>();
 
     private List<Tuple<string, string>> bibles = new List<Tuple<string, string>>();
+    private List<Tuple<int, string>>? versePortions { get; set; } = new List<Tuple<int, string>>();
+    private Tuple<int, string>? selectedPortion { get; set; } = new Tuple<int, string>(0, "");
 
     private Book selectedBook = new Book();
     private Chapter selectedChapter = new Chapter();
     private BeaconVerse selectedVerse = new BeaconVerse();
 
+    private string bookSearchTerm = "";
+    private string chapterSearchTerm = "";
+    private string verseIdSearchTerm = "";
+    private string verseSearchTerm = "";
     private string selectedBible = "";
     private string selectedDoubleViewBible = "";
     private bool doubleViewMode;
@@ -133,6 +144,9 @@
         if (doubleViewMode)
             await OnDoubleViewBibleChange(selectedDoubleViewBible).ConfigureAwait(false);
 
+        chapterSearchTerm = "";
+        verseSearchTerm = "";
+        await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "ChapterList", book.Id - 1).ConfigureAwait(false);
     }
     private async Task OnChapterChange(Chapter chapter)
     {
@@ -141,6 +155,8 @@
         selectedChapter = chapter;
         await GetVersesFromChapter(selectedBible, selectedBook.Id, chapter.Id);
 
+        verseSearchTerm = "";
+        await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "ChapterList", chapter.Id - 1).ConfigureAwait(false);
         if (!doubleViewMode) return;
 
         doubleViewVerses.Clear();
@@ -149,6 +165,16 @@
     private async Task OnVerseChange(BeaconVerse verse, bool isMain)
     {
         selectedVerse = verse;
+
+        versePortions!.Clear();
+        verse!.Text = verse!.Text.RemoveHighlight();
+
+        var portions = Regex.Split(verse.Text, @"(?<=[\.,;:!\?])\s+");
+        for (int i = 1; i <= portions.Length; i++)
+        {
+            versePortions.Add(new Tuple<int, string>(i, portions[i - 1]));
+        }
+        selectedPortion = new Tuple<int, string>(0, "");
 
         await Task.Delay(1).ConfigureAwait(false);
 
@@ -186,6 +212,50 @@
         verses = await bibleService.GetVersesAsync(bible, book, chapter).ConfigureAwait(false);
     }
 
+    private async Task OnBookInputQuery()
+    {
+        bookSearchTerm = Regex.Replace(bookSearchTerm, @"(\d)(\p{L})", "$1 $2");
+        books = await bibleService.SearchBooksAsync(selectedBible, bookSearchTerm).ConfigureAwait(false);
+
+        if(books.Count() == 1)
+        {
+            await OnBookChange(books[0]).ConfigureAwait(false);
+            await jSRuntime.InvokeVoidAsync("SwitchFocusTo", "ChapterSearchInput").ConfigureAwait(false);
+        }
+    }
+    private async Task OnChapterInputQuery()
+    {
+        int searchedChapterNumber;
+        bool isNumber = Int32.TryParse(chapterSearchTerm, out searchedChapterNumber);
+
+        if (isNumber && searchedChapterNumber > 0 && chapters.Count() > 0)
+        {
+            await OnChapterChange(chapters[Math.Min(searchedChapterNumber - 1, chapters.Count() - 1)]);
+            await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "ChapterList", searchedChapterNumber).ConfigureAwait(false);
+            await Task.Delay(100).ConfigureAwait(false);
+            await jSRuntime.InvokeVoidAsync("SwitchFocusTo", "VerseSearchInput").ConfigureAwait(false);
+        }
+        else
+        {
+            chapterSearchTerm = "";
+        }
+    }
+    private async Task OnVerseInputQuery()
+    {
+        int searchedVerseNumber;
+        bool isNumber = Int32.TryParse(verseSearchTerm, out searchedVerseNumber);
+
+        if (isNumber && searchedVerseNumber > 0 && verses.Count() > 0)
+        {
+            await OnVerseChange(verses[Math.Min(searchedVerseNumber - 1, verses.Count() - 1)], true);
+            await Task.Delay(100).ConfigureAwait(false);
+            await jSRuntime.InvokeVoidAsync("SwitchFocusTo", "VerseList1").ConfigureAwait(false);
+        }
+        else
+        {
+            verseSearchTerm = "";
+        }
+    }
 
     //[DOUBLE VIEW EVENTS]=====================================
     private async Task OnDoubleViewModeToggle()
@@ -203,5 +273,15 @@
         selectedDoubleViewBible = bible;
         doubleViewVerses.Clear();
         doubleViewVerses = await bibleService.GetVersesAsync(bible, selectedBook.Id, selectedChapter.Id).ConfigureAwait(false);
+    }
+    private async Task OnBookSearchInputKeyDown(KeyboardEventArgs e)
+    {
+        await Task.Delay(100).ConfigureAwait(false);
+
+        if (e.Key == "Enter" && books.Count() != 0)
+        {
+            await OnBookChange(books[0]).ConfigureAwait(false);
+            await jSRuntime.InvokeVoidAsync("SwitchFocusTo", "ChapterSearchInput").ConfigureAwait(false);
+        }
     }
 }

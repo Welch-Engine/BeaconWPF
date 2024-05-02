@@ -5,11 +5,11 @@
         {
             var isSelected = SelectedBook!.Id == book.Id;
 
-            <div class="flex items-center min-h-16 -mx-[5px] p-4 rounded-xl text-sm leading-5 line-clamp-1 cursor-pointer
+            <p class="flex items-center min-h-16 -mx-[5px] p-4 rounded-xl text-sm leading-5 line-clamp-1 cursor-pointer whitespace-pre
                         @(isSelected ? "bg-primary text-white" : "hover:bg-primary hover:text-white hover:bg-opacity-10")"
                  @onclick="(async () => await ChangeBook(book))">
-                @book.Name
-            </div>
+                @Title(book)
+            </p>
         }
     </div>
 }
@@ -17,6 +17,11 @@
     [Parameter] public Book? SelectedBook { get; set; } = new Book();
     [Parameter] public List<Book>? Books { get; set; }
     [Parameter] public EventCallback<Book> OnBookChanged { get; set; }
+
+    private RenderFragment Title(Book _book) => (builder) =>
+    {
+        builder.AddMarkupContent(0, $"{_book.Name}");
+    };
 
     private async Task ChangeBook(Book book) => await OnBookChanged.InvokeAsync(book);
 

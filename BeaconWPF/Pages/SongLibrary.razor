@@ -18,8 +18,8 @@
 
         <!-- QUERY SONG INPUT -->
         @if(!songQueuesMode){
-            <DebounceInput type="text" class="w-full h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Search..." DebounceTime="200"
-                           @bind-Value="searchTerm" @bind-Value:event="oninput" OnValueChanged="OnInputQuery" @onkeydown="((args) => OnSearchInputKeyDown(args))" />
+            <DebounceInput type="text" class="w-full h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Search..." DebounceTime="150"
+                           @bind-Value="searchTerm" @bind-Value:event="oninput" OnValueChanged="OnInputQuery" @onkeydown="OnSearchInputKeyDown" />
         }
         <!-- SONG LIST -->
         <SongList Songs="songs" SelectedSong="selectedSong" OnSongChanged="OnSongChange"

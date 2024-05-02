@@ -4,7 +4,7 @@
                                                 @(IsSelected ? "bg-primary text-white selected_Verse" : "hover:text-white hover:bg-primary hover:bg-opacity-20")
                                                 @(IsAlsoSelectedVerse ? "selected_Verse bg-primary bg-opacity-20" : "")"
          @onclick="ItemClick">
-        <p tabindex="0" @onkeydown="OnKeyDown" class="w-full p-6  bg-opacity-25 bg-gray_dark text-wrap text-sm outline-0">
+        <p id="@($"Verse{Verse.Verse}")" tabindex="0" @onkeydown="OnKeyDown" class="w-full p-6  bg-opacity-25 bg-gray_dark text-wrap text-sm outline-0">
             <span>@Verse.Verse.&nbsp;</span>
             @if (IsSelected && VersePortions is not null)
             {

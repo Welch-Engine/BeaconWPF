@@ -1,12 +1,12 @@
 ﻿@if (Chapters is not null)
 {
-    <div class="flex flex-col w-full h-full overflow-y-auto bg-gray rounded-xl scroll-gutter outline-0">
+    <div id="ChapterList" class="flex flex-col w-full h-full overflow-y-auto bg-gray rounded-xl scroll-gutter outline-0">
         @foreach (var chapter in Chapters)
         {
             var isSelected = SelectedChapter!.Id == chapter.Id;
 
             <div class="flex items-center min-h-16 -mx-[5px] p-4 rounded-xl text-sm leading-5 line-clamp-1 cursor-pointer
-                        @(isSelected ? "bg-primary text-white" : "hover:bg-primary hover:text-white hover:bg-opacity-10")"
+                        @(isSelected ? "bg-primary text-white selected_Chapter" : "hover:bg-primary hover:text-white hover:bg-opacity-10")"
                  @onclick="(async () => await ChangeChapter(chapter))">
                 @chapter.Id
             </div>

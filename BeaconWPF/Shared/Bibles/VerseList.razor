@@ -1,4 +1,6 @@
-﻿@if (Verses is not null)
+﻿@inject IJSRuntime jSRuntime
+
+@if (Verses is not null)
 {
     <div id="@Id" tabindex="0" class="flex flex-col w-full h-full overflow-auto bg-gray rounded-xl scroll-gutter outline-0 gap-1"
          @onkeydown="((args) => OnKeyDown(args))">
@@ -9,7 +11,7 @@
             var isSelected = verse.Verse == SelectedVerse!.Verse && verse.Text == SelectedVerse!.Text;
 
             <VerseItem Verse="verse" IsSelected="isSelected" OnItemClick="ChangeVerse" IsAlsoSelectedVerse="isAlsoSelectedVerse"
-                       VersePortions="versePortions" SelectedPortion="selectedPortion" OnPortionKeyDown="OnPortionKeyDown"
+                       VersePortions="VersePortions" SelectedPortion="SelectedPortion" OnPortionKeyDown="OnPortionKeyDown"
                         OnItemPortionClick="ChangeVersePortion"></VerseItem>
         }
 
@@ -22,31 +24,21 @@
     [Parameter] public EventCallback<BeaconVerse> OnVerseChanged { get; set; }
     [Parameter] public EventCallback<string> OnVersePortionChanged { get; set; }
 
-    private List<Tuple<int, string>>? versePortions { get; set; } = new List<Tuple<int, string>>();
-    private Tuple<int, string>? selectedPortion { get; set; } = new Tuple<int, string>(0, "");
+    [Parameter] public List<Tuple<int, string>>? VersePortions { get; set; } = new List<Tuple<int, string>>();
+    [Parameter] public Tuple<int, string>? SelectedPortion { get; set; } = new Tuple<int, string>(0, "");
+    private BeaconVerse previousVerse = new BeaconVerse();
 
     public bool shouldNextVerse = true;
 
     private async Task ChangeVerse(BeaconVerse verse)
     {
-        versePortions!.Clear();
-        verse!.Text = verse!.Text.RemoveHighlight();
-
-        var portions = Regex.Split(verse.Text, @"(?<=[\.,;:!\?])\s+");
-        for(int i = 1; i <= portions.Length; i++)
-        {
-            versePortions.Add(new Tuple<int, string>(i, portions[i - 1]));
-        }
-
-        selectedPortion = new Tuple<int, string>(0, "");
         shouldNextVerse = true;
-
         await OnVerseChanged.InvokeAsync(verse).ConfigureAwait(false);
     }
     private async Task ChangeVersePortion(Tuple<int, string> portion)
     {
         shouldNextVerse = false;
-        selectedPortion = portion;
+        SelectedPortion = portion;
         await OnVersePortionChanged.InvokeAsync(portion.Item2).ConfigureAwait(false);
     }
 
@@ -60,8 +52,11 @@
 
         if (!shouldNextVerse) return;
 
-        if (_args.Code == "Enter" && versePortions is not null)
-            selectedPortion = versePortions[0];
+        if (_args.Code == "Enter" && VersePortions is not null)
+        {
+            SelectedPortion = VersePortions[0];
+            await jSRuntime.InvokeVoidAsync("SwitchFocusTo", $"Verse{SelectedVerse!.Verse}");
+        }
 
         if (Verses is null && SelectedVerse is null || SelectedVerse!.Verse == 0 || Verses!.Count == 0)
             return;
@@ -83,10 +78,10 @@
         if (timeElapsed <= 150) return;
         lastPortionKeyDownTime = currentTime;
 
-        if (versePortions is null || selectedPortion is null || versePortions!.Count() == 0 || selectedPortion.Item1 == 0)
+        if (VersePortions is null || SelectedPortion is null || VersePortions!.Count() == 0 || SelectedPortion.Item1 == 0)
             return;
 
-        var index = versePortions!.IndexOf(versePortions.Where(v => v.Item1 == selectedPortion!.Item1).First());
+        var index = VersePortions!.IndexOf(VersePortions.Where(v => v.Item1 == SelectedPortion!.Item1).First());
 
         if (_args.Code == "ArrowUp")
         {
@@ -96,24 +91,25 @@
                 shouldNextVerse = false;
                 await Task.Delay(10);
                 await ChangeVerse(Verses[Math.Max(verseIndex - 1, 0)]).ConfigureAwait(false);
-                selectedPortion = versePortions[versePortions.Count() - 1];
+                SelectedPortion = VersePortions[VersePortions.Count() - 1];
                 return;
             }
-            await ChangeVersePortion(versePortions[Math.Max(index - 1, 0)]).ConfigureAwait(false);
+            await ChangeVersePortion(VersePortions[Math.Max(index - 1, 0)]).ConfigureAwait(false);
         }
         else if (_args.Code == "ArrowDown")
         {
-            if (index == versePortions.Count() - 1)
+            if (index == VersePortions.Count() - 1)
             {
                 var verseIndex = Verses!.IndexOf(Verses.Where(v => v.Verse == SelectedVerse!.Verse).First());
                 shouldNextVerse = false;
                 await Task.Delay(10);
                 await ChangeVerse(Verses[Math.Min(verseIndex + 1, Verses.Count() - 1)]).ConfigureAwait(false);
-                selectedPortion = versePortions[0];
+                SelectedPortion = VersePortions[0];
                 return;
             }
-            await ChangeVersePortion(versePortions[Math.Min(index + 1, versePortions.Count() - 1)]).ConfigureAwait(false);
+            await ChangeVersePortion(VersePortions[Math.Min(index + 1, VersePortions.Count() - 1)]).ConfigureAwait(false);
         }
+
     }
 
 }

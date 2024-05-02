@@ -18,18 +18,45 @@ namespace BeaconWPF.Data.Bibles
         }
         public async Task CreateTable() => await dbConnection.CreateTableAsync<Bible>().ConfigureAwait(false);
 
+        //[GET]=========================================
         public async Task<List<Book>> GetBooksAsync(string translation, bool useEnglish = false)
             => useEnglish ? await dbConnection.QueryAsync<Book>($"SELECT * FROM kjvBooks").ConfigureAwait(false) :
                             await dbConnection.QueryAsync<Book>($"SELECT * FROM {translation}Books").ConfigureAwait(false);
-
         public async Task<List<Chapter>> GetChaptersAsync(string translation, int book)
             => await dbConnection.QueryAsync<Chapter>($"SELECT DISTINCT Chapter FROM {translation} WHERE Book = {book}").ConfigureAwait(false);
-
         public async Task<List<BeaconVerse>> GetVersesAsync(string translation, int book, int chapter)
             => await dbConnection.QueryAsync<BeaconVerse>($"SELECT * FROM {translation} WHERE Book = {book} AND Chapter = {chapter}").ConfigureAwait(false);
-
         public async Task<List<Bible>> GetBiblesAsync() => await dbConnection.QueryAsync<Bible>("SELECT * FROM Bibles");
 
+        //[SEARCH]=========================================
+        public async Task<List<Book>> SearchBooksAsync(string translation, string searchTerm, bool useEnglish = false)
+        {
+            var books = new List<Book>();
+
+            if (useEnglish)
+                books = await dbConnection.QueryAsync<Book>($"SELECT * FROM kjvaBooks WHERE Name LIKE '%{searchTerm}%'");
+            else
+                books = await dbConnection.QueryAsync<Book>($"SELECT * FROM {translation}Books WHERE Name LIKE '%{searchTerm}%'");
+
+
+            // Give HIGHLIGHT to the BOOK QUERY
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                foreach (var book in books)
+                {
+                    int startIndex = book.Name.ToLower().IndexOf(searchTerm.ToLower());
+                    int endIndex = startIndex + searchTerm.Length;
+                    string wrap = book.Name.Substring(startIndex, endIndex - startIndex);
+                    wrap = book.Name.Replace(wrap, "<span class=\"text-orange group-hover:text-white_light\">" + wrap + "</span>");
+                    book.Name = wrap;
+                }
+            }
+
+            return books;
+        }
+
+
+        //[API]=========================================
         public async Task DownloadBible(string translation)
         {
             //CHECK IF EXISTS
@@ -48,6 +75,16 @@ namespace BeaconWPF.Data.Bibles
             //CONVERT AND INSERT TO TABLE
             await ConvertAndSaveToDatabase(bible).ConfigureAwait(false);
             await dbConnection.ExecuteAsync("VACUUM").ConfigureAwait(false);
+        }
+        public async Task<Bible> GetAPIBibleAsync(string translation)
+        {
+            HttpResponseMessage responseMessage = await httpClient.GetAsync($"https://api.getbible.net/v2/{translation}.json").ConfigureAwait(false);
+
+            var bible = new Bible();
+            if (responseMessage.IsSuccessStatusCode)
+                bible = await responseMessage.Content.ReadFromJsonAsync<Bible>().ConfigureAwait(false);
+
+            return bible!;
         }
         private async Task ConvertAndSaveToDatabase(Bible bible)
         {
@@ -68,17 +105,6 @@ namespace BeaconWPF.Data.Bibles
                 }
             }).ConfigureAwait(false);
         }
-
-        public async Task<Bible> GetAPIBibleAsync(string translation)
-        {
-            HttpResponseMessage responseMessage = await httpClient.GetAsync($"https://api.getbible.net/v2/{translation}.json").ConfigureAwait(false);
-
-            var bible = new Bible();
-            if (responseMessage.IsSuccessStatusCode)
-                bible = await responseMessage.Content.ReadFromJsonAsync<Bible>().ConfigureAwait(false);
-
-            return bible!;
-        }
     }
 
     public interface IBibleService
@@ -88,6 +114,7 @@ namespace BeaconWPF.Data.Bibles
         public Task<List<Book>> GetBooksAsync(string translation, bool useEnglish = false);
         public Task<List<Chapter>> GetChaptersAsync(string translation, int book);
         public Task<List<BeaconVerse>> GetVersesAsync(string translation, int book, int chapter);
+        public Task<List<Book>> SearchBooksAsync(string translation, string searchTerm, bool useEnglish = false);
         public Task DownloadBible(string translation);
     }
 }
