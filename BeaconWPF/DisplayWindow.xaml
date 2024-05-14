@@ -1,12 +1,49 @@
 ﻿<Window x:Class="BeaconWPF.DisplayWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:b="http://schemas.microsoft.com/winfx/2006/xaml/presentation/blazor"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BeaconWPF"
+        xmlns:hlpr="clr-namespace:BeaconWPF.Data.Helpers"
         mc:Ignorable="d"
+        Closing="Window_Closing" 
+        Background="#0A0A0A"
         Title="DisplayWindow" Height="450" Width="800">
     <Grid>
+        <!-- =====================================
+        VIEW BOX: easy resizing of content
         
+        REMOVE WIDTH IF The sizing is for songs
+        SPECIFY WIDTH IF The sizing is for bible
+        ========================================== -->
+        <Viewbox Stretch="Uniform">
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20" Width="1280">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"  >
+
+                    <DockPanel>
+                        <TextBlock Background="Transparent" 
+                                   TextWrapping="Wrap" FontFamily="Gontserrat"  
+                                   Foreground="#F5F3F5" Text="ON MY KNEES" TextDecorations="Underline"
+                                   FontWeight="Bold" FontSize="45" HorizontalAlignment="Left"/>
+                        <TextBlock Background="Transparent" 
+                                   TextWrapping="Wrap" FontFamily="Gontserrat"
+                                   Foreground="#F5F3F5" Text="1 / 3" VerticalAlignment="Center"
+                                    FontSize="35" HorizontalAlignment="Right"/>
+                    </DockPanel>
+
+                    <hlpr:HighlightableTextBlock x:Name="DisplayBibleTextBox" 
+                                                 TextWrapping="WrapWithOverflow" FontFamily="Gontserrat"
+                                                 Foreground="#F5F3F5" VerticalAlignment="Center" HighlightBrush="Orange"  HighlightCount="0" Opacity=".9"
+                                                 FontSize="45" TextAlignment="Left">
+                    </hlpr:HighlightableTextBlock>
+                    
+                </StackPanel>
+            </Grid>
+        </Viewbox>
+
+        <Viewbox Stretch="Uniform">
+            
+        </Viewbox>
     </Grid>
 </Window>

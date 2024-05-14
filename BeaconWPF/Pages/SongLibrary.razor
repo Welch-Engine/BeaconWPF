@@ -148,6 +148,8 @@
         await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "SongList", index).ConfigureAwait(false);
 
         showSongInfo = true;
+
+        Application.Current.Dispatcher.Invoke((Action)delegate { DisplayWindow.Instance.Close(); });
     }
     private async Task OnLyricChange(Lyric lyric)
     {
@@ -155,6 +157,8 @@
 
         await Task.Delay(1).ConfigureAwait(false);
         await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "highlighted_lyric", "LyricList").ConfigureAwait(false);
+
+        Application.Current.Dispatcher.Invoke((Action)delegate { DisplayWindow.Instance.Show(); });
     }
     private async Task OnSearchInputKeyDown(KeyboardEventArgs args)
     {
