@@ -58,11 +58,11 @@
         <div class="flex w-full h-full py-1 px-1 overflow-y-hidden bg-black">
 
             <VerseList Id="VerseList1" Verses="verses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, true))"
-                        VersePortions="versePortions" SelectedPortion="selectedPortion"/>
+                        VersePortions="versePortions" SelectedPortion="selectedPortion" OnVersePortionChanged="OnVersePortionChange"/>
 
             @if(doubleViewMode){
                 <VerseList Id="VerseList2" Verses="doubleViewVerses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, false))"
-                           VersePortions="versePortions" SelectedPortion="selectedPortion" />
+                           VersePortions="versePortions" SelectedPortion="selectedPortion" OnVersePortionChanged="OnVersePortionChange" />
             }
 
         </div>
@@ -191,6 +191,24 @@
             await Task.Delay(300).ConfigureAwait(false);
             await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList1").ConfigureAwait(false);
         }
+
+        //DISPLAY WINDOW
+        await InvokeAsync(() =>
+        {
+            DisplayWindow.Instance.Show();
+            DisplayWindow.Instance.Content.Text = verse.Text;
+            DisplayWindow.Instance.Content.HighlightCount = 0; 
+            DisplayWindow.Instance.Header1.Text = selectedBook.Name.RemoveHighlight() + " " + selectedChapter.Id + ":" + verse.Verse;
+            DisplayWindow.Instance.Header2.Text = isMain ? selectedBible.ToUpper() : selectedDoubleViewBible.ToUpper();
+        }).ConfigureAwait(false);
+    }
+
+    private async Task OnVersePortionChange(Tuple<int, string> versePortion)
+    {
+        await InvokeAsync(() => {
+            DisplayWindow.Instance.Content.HighlightCount = versePortion.Item1;
+            DisplayWindow.Instance.Content.FontSize = 80;
+        }).ConfigureAwait(false);
     }
 
     private async Task GetBooksFromBible(string bible = "")

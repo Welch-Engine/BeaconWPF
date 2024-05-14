@@ -37,8 +37,8 @@
     [Parameter] public List<Tuple<int, string>>? VersePortions { get; set; }
     [Parameter] public Tuple<int, string>? SelectedPortion { get; set; }
 
-    private async Task ItemClick() => await OnItemClick.InvokeAsync(Verse);
-    private async Task ItemPortionClick(Tuple<int, string> portion) => await OnItemPortionClick.InvokeAsync(portion);
-    private async Task OnKeyDown(KeyboardEventArgs args) => await OnPortionKeyDown.InvokeAsync(args);
+    private async Task ItemClick() => await OnItemClick.InvokeAsync(Verse).ConfigureAwait(false);
+    private async Task ItemPortionClick(Tuple<int, string> portion) => await OnItemPortionClick.InvokeAsync(portion).ConfigureAwait(false);
+    private async Task OnKeyDown(KeyboardEventArgs args) => await OnPortionKeyDown.InvokeAsync(args).ConfigureAwait(false);
 
 }

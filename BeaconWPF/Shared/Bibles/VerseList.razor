@@ -22,7 +22,7 @@
     [Parameter] public BeaconVerse? SelectedVerse { get; set; }
     [Parameter] public string? Id { get; set; }
     [Parameter] public EventCallback<BeaconVerse> OnVerseChanged { get; set; }
-    [Parameter] public EventCallback<string> OnVersePortionChanged { get; set; }
+    [Parameter] public EventCallback<Tuple<int, string>> OnVersePortionChanged { get; set; }
 
     [Parameter] public List<Tuple<int, string>>? VersePortions { get; set; } = new List<Tuple<int, string>>();
     [Parameter] public Tuple<int, string>? SelectedPortion { get; set; } = new Tuple<int, string>(0, "");
@@ -38,8 +38,10 @@
     private async Task ChangeVersePortion(Tuple<int, string> portion)
     {
         shouldNextVerse = false;
+        await OnVersePortionChanged.InvokeAsync(portion).ConfigureAwait(false);
+        await Task.Delay(10).ConfigureAwait(false);
         SelectedPortion = portion;
-        await OnVersePortionChanged.InvokeAsync(portion.Item2).ConfigureAwait(false);
+        await InvokeAsync(StateHasChanged);
     }
 
     private DateTime lastKeyDownTime = DateTime.MinValue;
@@ -92,6 +94,10 @@
                 await Task.Delay(10);
                 await ChangeVerse(Verses[Math.Max(verseIndex - 1, 0)]).ConfigureAwait(false);
                 SelectedPortion = VersePortions[VersePortions.Count() - 1];
+
+                //REALLY HACKY OF ME
+                await InvokeAsync(() => DisplayWindow.Instance.Content.HighlightCount = VersePortions.Count()).ConfigureAwait(false);
+
                 return;
             }
             await ChangeVersePortion(VersePortions[Math.Max(index - 1, 0)]).ConfigureAwait(false);
@@ -105,6 +111,10 @@
                 await Task.Delay(10);
                 await ChangeVerse(Verses[Math.Min(verseIndex + 1, Verses.Count() - 1)]).ConfigureAwait(false);
                 SelectedPortion = VersePortions[0];
+
+                //REALLY HACKY OF ME
+                await InvokeAsync(() => DisplayWindow.Instance.Content.HighlightCount = 1).ConfigureAwait(false);
+
                 return;
             }
             await ChangeVersePortion(VersePortions[Math.Min(index + 1, VersePortions.Count() - 1)]).ConfigureAwait(false);

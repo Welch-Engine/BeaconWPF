@@ -149,7 +149,6 @@
 
         showSongInfo = true;
 
-        Application.Current.Dispatcher.Invoke((Action)delegate { DisplayWindow.Instance.Close(); });
     }
     private async Task OnLyricChange(Lyric lyric)
     {
@@ -158,7 +157,13 @@
         await Task.Delay(1).ConfigureAwait(false);
         await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "highlighted_lyric", "LyricList").ConfigureAwait(false);
 
-        Application.Current.Dispatcher.Invoke((Action)delegate { DisplayWindow.Instance.Show(); });
+        await InvokeAsync(() =>
+        { 
+            DisplayWindow.Instance.Show();
+            DisplayWindow.Instance.Content.Text = lyric.Text;
+            DisplayWindow.Instance.Header1.Text = selectedSong.Title.ToUpper();
+            DisplayWindow.Instance.Header2.Text = lyric.Id + " / " + selectedSong.Lyrics().Count();
+        }).ConfigureAwait(false);
     }
     private async Task OnSearchInputKeyDown(KeyboardEventArgs args)
     {

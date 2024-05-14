@@ -9,41 +9,31 @@
         mc:Ignorable="d"
         Closing="Window_Closing" 
         Background="#0A0A0A"
-        Title="DisplayWindow" Height="450" Width="800">
-    <Grid>
-        <!-- =====================================
-        VIEW BOX: easy resizing of content
-        
-        REMOVE WIDTH IF The sizing is for songs
-        SPECIFY WIDTH IF The sizing is for bible
-        ========================================== -->
-        <Viewbox Stretch="Uniform">
-            <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20" Width="1280">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"  >
+        Title="DisplayWindow" Height="720" Width="1280">
+    <DockPanel>
 
-                    <DockPanel>
-                        <TextBlock Background="Transparent" 
-                                   TextWrapping="Wrap" FontFamily="Gontserrat"  
-                                   Foreground="#F5F3F5" Text="ON MY KNEES" TextDecorations="Underline"
-                                   FontWeight="Bold" FontSize="45" HorizontalAlignment="Left"/>
-                        <TextBlock Background="Transparent" 
-                                   TextWrapping="Wrap" FontFamily="Gontserrat"
-                                   Foreground="#F5F3F5" Text="1 / 3" VerticalAlignment="Center"
-                                    FontSize="35" HorizontalAlignment="Right"/>
-                    </DockPanel>
-
-                    <hlpr:HighlightableTextBlock x:Name="DisplayBibleTextBox" 
-                                                 TextWrapping="WrapWithOverflow" FontFamily="Gontserrat"
-                                                 Foreground="#F5F3F5" VerticalAlignment="Center" HighlightBrush="Orange"  HighlightCount="0" Opacity=".9"
-                                                 FontSize="45" TextAlignment="Left">
-                    </hlpr:HighlightableTextBlock>
-                    
-                </StackPanel>
-            </Grid>
+        <Viewbox Stretch="Uniform" DockPanel.Dock="Top">
+            <Border Background="#0F0F10" CornerRadius="24" Margin="20" Padding="50 20">
+                <DockPanel Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DockPanel}}, Path=ActualWidth}">
+                    <TextBlock Background="Transparent" x:Name="Header1"
+                                           TextWrapping="Wrap" FontFamily="Gontserrat"  
+                                           Foreground="#F5F3F5" VerticalAlignment="Center"
+                                           FontWeight="Bold" FontSize="40" HorizontalAlignment="Left"/>
+                    <TextBlock Background="Transparent" x:Name="Header2"
+                                           TextWrapping="Wrap" 
+                                           Foreground="#F5F3F5" VerticalAlignment="Center"
+                                           FontSize="35" HorizontalAlignment="Right"/>
+                </DockPanel>
+            </Border>
         </Viewbox>
 
-        <Viewbox Stretch="Uniform">
-            
+        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" Margin="0 0 0 20">
+            <hlpr:HighlightableTextBlock x:Name="Content"  Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DockPanel}}, Path=ActualWidth}"
+                                                 TextWrapping="Wrap" FontFamily="Gontserrat"
+                                                 Foreground="#F5F3F5" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                                 HighlightBrush="Orange"  HighlightCount="0" Opacity=".9"
+                                                 FontSize="65" TextAlignment="Center">
+            </hlpr:HighlightableTextBlock>
         </Viewbox>
-    </Grid>
+    </DockPanel>
 </Window>

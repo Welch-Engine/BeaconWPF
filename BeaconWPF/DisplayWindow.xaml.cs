@@ -24,16 +24,9 @@ namespace BeaconWPF
         public static DisplayWindow Instance { get; private set; }
         static DisplayWindow() => Instance = new DisplayWindow();
 
-        public static string TextToDisplay = "";
-        public static string Header1 = "";
-        public static string Header2 = "";
-
-
         public DisplayWindow()
 		{
 			InitializeComponent();
-            DisplayBibleTextBox.Text = "And when You come You'll meet me, on my knees\r\nIn consecration, on my knees\r\nI'm on the threshing floor, on my knees\r\nOh Lord, I need You, on my knees\r\nI'm waiting patiently, on my knees\r\nI need You, Holy Spirit, on my knees\r\nWhen You come You will meet me, on my knees\r\nLord, I'm not moving, on my knees\r\nLord, right here I am staying, on my knees\r\nLord, it's important to me, on my knees\r\nWhen You come you will meet me, on my knees\r\nI want the Holy Spirit, on my knees\r\nadsds";
-
         }
 
         //! ====================================================
@@ -41,7 +34,6 @@ namespace BeaconWPF
         //! ====================================================
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            DisplayBibleTextBox.Text = "And when You come You'll meet me, on my knees\r\nIn consecration, on my knees\r\nI'm on the threshing floor, on my knees\r\nOh Lord, I need You, on my knees\r\nI'm waiting patiently, on my knees\r\nI need You, Holy Spirit, on my knees\r\nWhen You come You will meet me, on my knees\r\nLord, I'm not moving, on my knees\r\nLord, right here I am staying, on my knees\r\nLord, it's important to me, on my knees\r\nWhen You come you will meet me, on my knees\r\nI want the Holy Spirit, on my knees\r\nadsds";
             this.Visibility = Visibility.Collapsed;
             e.Cancel = true;
         }
