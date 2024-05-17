@@ -9,7 +9,7 @@
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<DefaultItemExcludes>wwwroot/**</DefaultItemExcludes>
-        s
+        
 		<!--CHANGE VERSION HERE AS WELL-->
 		<Title>Beacon</Title>
 		<Author>Newt Welch</Author>
