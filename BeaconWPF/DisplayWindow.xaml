@@ -8,8 +8,18 @@
         xmlns:hlpr="clr-namespace:BeaconWPF.Data.Helpers"
         mc:Ignorable="d"
         Closing="Window_Closing" 
+        ShowActivated="False"
+        IsVisibleChanged="Window_IsVisibleChanged"
+        WindowStyle="None"
         Background="#0A0A0A"
-        Title="DisplayWindow" Height="720" Width="1280">
+        Title="DisplayWindow" d:Height="720" d:Width="1280">
+    <!-- =====================================
+WINDOW CHROME: custom title bar and window stuff
+========================================== -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="5" CornerRadius="0"
+                 GlassFrameThickness="0" />
+    </WindowChrome.WindowChrome>
     <DockPanel>
 
         <Viewbox Stretch="Uniform" DockPanel.Dock="Top">

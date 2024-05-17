@@ -161,6 +161,7 @@
         { 
             DisplayWindow.Instance.Show();
             DisplayWindow.Instance.Content.Text = lyric.Text;
+            DisplayWindow.Instance.Content.FontSize = 65;
             DisplayWindow.Instance.Header1.Text = selectedSong.Title.ToUpper();
             DisplayWindow.Instance.Header2.Text = lyric.Id + " / " + selectedSong.Lyrics().Count();
         }).ConfigureAwait(false);

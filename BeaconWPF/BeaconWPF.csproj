@@ -59,6 +59,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
         <PackageReference Include="Velopack" Version="0.0.359" />
+        <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
     </ItemGroup>
 
     <ItemGroup>

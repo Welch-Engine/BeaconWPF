@@ -197,6 +197,7 @@
         {
             DisplayWindow.Instance.Show();
             DisplayWindow.Instance.Content.Text = verse.Text;
+            DisplayWindow.Instance.Content.FontSize = 80;
             DisplayWindow.Instance.Content.HighlightCount = 0; 
             DisplayWindow.Instance.Header1.Text = selectedBook.Name.RemoveHighlight() + " " + selectedChapter.Id + ":" + verse.Verse;
             DisplayWindow.Instance.Header2.Text = isMain ? selectedBible.ToUpper() : selectedDoubleViewBible.ToUpper();
