@@ -39,7 +39,7 @@ WINDOW CHROME: custom title bar and window stuff
 
         <Viewbox Stretch="Uniform" StretchDirection="DownOnly" Margin="0 0 0 20">
             <hlpr:HighlightableTextBlock x:Name="Content"  Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DockPanel}}, Path=ActualWidth}"
-                                                 TextWrapping="Wrap" FontFamily="Gontserrat"
+                                                 TextWrapping="Wrap" FontFamily="Gontserrat" Background="Transparent"
                                                  Foreground="#F5F3F5" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                                  HighlightBrush="Orange"  HighlightCount="0" Opacity=".9"
                                                  FontSize="65" TextAlignment="Center">
