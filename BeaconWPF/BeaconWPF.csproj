@@ -9,14 +9,15 @@
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<DefaultItemExcludes>wwwroot/**</DefaultItemExcludes>
-
+        s
+		<!--CHANGE VERSION HERE AS WELL-->
 		<Title>Beacon</Title>
 		<Author>Newt Welch</Author>
-		<Version>0.1.0</Version>
+		<Version>0.2.3</Version>
 		<PublisherName>Welch Engine</PublisherName>
 		<AssemblyTitle>Beacon</AssemblyTitle>
 		<AssemblyName>Beacon</AssemblyName>
-		<AssemblyVersion>0.1.0</AssemblyVersion>
+		<AssemblyVersion>0.2.3</AssemblyVersion>
 		
 		<StartupObject>BeaconWPF.Program</StartupObject>
 		
