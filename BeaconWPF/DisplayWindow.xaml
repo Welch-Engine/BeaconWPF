@@ -28,11 +28,11 @@ WINDOW CHROME: custom title bar and window stuff
                     <TextBlock Background="Transparent" x:Name="Header1"
                                            TextWrapping="Wrap" FontFamily="Gontserrat"  
                                            Foreground="#F5F3F5" VerticalAlignment="Center"
-                                           FontWeight="Bold" FontSize="40" HorizontalAlignment="Left"/>
+                                           FontWeight="Bold" FontSize="50" HorizontalAlignment="Left"/>
                     <TextBlock Background="Transparent" x:Name="Header2"
                                            TextWrapping="Wrap" 
                                            Foreground="#F5F3F5" VerticalAlignment="Center"
-                                           FontSize="35" HorizontalAlignment="Right"/>
+                                           FontSize="50" HorizontalAlignment="Right"/>
                 </DockPanel>
             </Border>
         </Viewbox>

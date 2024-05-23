@@ -5,7 +5,7 @@
         <Virtualize Items="Songs" Context="song" OverscanCount="10" ItemSize="64">
             @{
                 var isSelected = song.Id == SelectedSong!.Id;
-                <SongItem Song="song" OnItemClick="ChangeSong" IsSelected="isSelected"
+                <SongItem Song="song" OnItemClick="ChangeSong" IsSelected="isSelected" HideDelete="SongQueueMode"
                           QueueToggle="AddRemoveSongFromQueueClick" DeleteSong="Delete"></SongItem>
             }
         </Virtualize>
@@ -14,6 +14,7 @@
 @code {
     [Parameter] public Song? SelectedSong{ get; set; }
     [Parameter] public List<Song>? Songs { get; set; }
+    [Parameter] public bool SongQueueMode { get; set; }
     [Parameter] public EventCallback<Song> OnSongChanged { get; set; }
     [Parameter] public EventCallback<Song> AddRemoveSongFromQueue { get; set; }
     [Parameter] public EventCallback<Song> DeleteSong { get; set; }

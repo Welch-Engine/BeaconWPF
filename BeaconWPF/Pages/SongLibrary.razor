@@ -22,7 +22,7 @@
                            @bind-Value="searchTerm" @bind-Value:event="oninput" OnValueChanged="OnInputQuery" @onkeydown="OnSearchInputKeyDown" />
         }
         <!-- SONG LIST -->
-        <SongList Songs="songs" SelectedSong="selectedSong" OnSongChanged="OnSongChange"
+        <SongList Songs="songs" SelectedSong="selectedSong" OnSongChanged="OnSongChange" SongQueueMode="songQueuesMode"
                   AddRemoveSongFromQueue="@((song) => AddRemoveSongFromQueue(song))" DeleteSong="DeleteSong"></SongList>
     </div>
 
@@ -160,8 +160,9 @@
         await InvokeAsync(() =>
         { 
             DisplayWindow.Instance.Show();
-            DisplayWindow.Instance.Content.Text = lyric.Text;
-            DisplayWindow.Instance.Content.FontSize = 65;
+            DisplayWindow.Instance.Content.Text = lyric.Text.RemoveHighlight();
+            DisplayWindow.Instance.Content.FontSize = 80;
+            DisplayWindow.Instance.Content.HighlightCount = 0;
             DisplayWindow.Instance.Header1.Text = selectedSong.Title.ToUpper();
             DisplayWindow.Instance.Header2.Text = lyric.Id + " / " + selectedSong.Lyrics().Count();
         }).ConfigureAwait(false);

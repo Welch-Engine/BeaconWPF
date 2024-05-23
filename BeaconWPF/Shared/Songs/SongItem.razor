@@ -30,13 +30,14 @@
     <div class="gap-3 text-base @(IsSelected ? "flex" : Song.InQueue ? "flex" : "hidden group-hover:flex")">
         <Button Icon="@(Song.InQueue ? "R" : "A")" Css="@(IsSelected ? "hover:opacity-50" : "hover:text-primary")"
                 OnClick="QueueClick"></Button>
-        <Button Icon="D" Css="@(IsSelected ? "hover:text-red" : "invisible group-hover:visible hover:text-red")" OnClick="DeleteClick"></Button>
+        <Button Icon="D" Css="@(HideDelete ? "hidden" : IsSelected ? "hover:text-red" : "invisible group-hover:visible hover:text-red")" OnClick="DeleteClick"></Button>
     </div>
 
 </div>
 @code {
     [Parameter] public Song? Song { get; set; }
     [Parameter] public bool IsSelected {get; set;}
+    [Parameter] public bool HideDelete {get; set;}
     [Parameter] public EventCallback<Song> OnItemClick { get; set; }
     [Parameter] public EventCallback<Song> DeleteSong { get; set; }
     [Parameter] public EventCallback<Song> QueueToggle { get; set; }
