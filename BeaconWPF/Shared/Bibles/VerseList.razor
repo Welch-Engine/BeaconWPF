@@ -2,7 +2,7 @@
 
 @if (Verses is not null)
 {
-    <div id="@Id" tabindex="0" class="flex flex-col w-full h-full overflow-auto bg-gray rounded-xl scroll-gutter outline-0 gap-1"
+    <div id="@Id" tabindex="0" class="flex flex-col w-full h-full gap-1 overflow-auto bg-gray rounded-xl scroll-gutter outline-0"
          @onkeydown="((args) => OnKeyDown(args))">
 
         @foreach (var verse in Verses)

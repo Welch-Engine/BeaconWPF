@@ -1,5 +1,5 @@
 ﻿@if(Lyrics is not null){
-    <div id="LyricList" tabindex="0" class="flex flex-col w-full h-full overflow-auto bg-gray rounded-xl scroll-gutter outline-0 gap-1"
+    <div id="LyricList" tabindex="0" class="flex flex-col w-full h-full gap-1 overflow-auto bg-gray rounded-xl scroll-gutter outline-0"
          @onkeydown="((args) => OnKeyDown(args))">
         @foreach (var lyric in Lyrics)
         {

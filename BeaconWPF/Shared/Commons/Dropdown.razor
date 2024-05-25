@@ -1,7 +1,7 @@
 ﻿<div tabindex="0" class="relative flex border-[1px] rounded-xl border-gray_1 cursor-pointer @Css"
      onclick="@(() =>{ showOptions = !showOptions; })" onblur="@(() =>{ showOptions = false; })">
-    <p class="px-6 py-3 w-full h-fit truncate overflow-hidden">@SelectedOption</p>
-    <div class="flex-1 h-full w-fit bg-gray_1 rounded-xl px-3 flex items-center">
+    <p class="w-full px-6 py-3 overflow-hidden truncate h-fit">@SelectedOption</p>
+    <div class="flex items-center flex-1 h-full px-3 w-fit bg-gray_1 rounded-xl">
         <svg width="13px" height="8px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
         <g transform="matrix(1,0,0,1,-2159.69,-37.298)">
         <g transform="matrix(0.0385476,0,0,0.0385476,2159.69,26.2001)">
@@ -12,10 +12,10 @@
     </div>
 
     @if(showOptions){
-        <div class="absolute flex flex-col w-full min-h-fit max-h-32 bg-gray_1 overflow-auto rounded-xl mt-11">
+        <div class="absolute flex flex-col w-full overflow-auto min-h-fit max-h-32 bg-gray_1 rounded-xl mt-11">
             @foreach(var option in Options)
             {
-                <div class="hover:text-white hover:bg-primary hover:bg-opacity-20 rounded-xl px-6 py-3 cursor-pointer"
+                <div class="px-6 py-3 cursor-pointer hover:text-white hover:bg-primary hover:bg-opacity-20 rounded-xl"
                      onclick="@(async () => { await OptionClicked(option.Item1, option.Item2); })">
                     @option.Item2
                 </div>

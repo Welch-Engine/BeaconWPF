@@ -3,42 +3,41 @@
 @using Velopack
 @using Velopack.Sources
 
-<div class="flex flex-col w-full h-full p-3 gap-3">
+<div class="flex h-full w-full flex-col gap-3 p-3">
 
     <!-- WHEN NEW UPDATE IS FOUND -->
         @if (newUpdateAvailable && updateManager is not null)
     {
-        <div class="flex w-full h-fit rounded-xl px-6 py-3 border-[1px] border-gray_1 cursor-pointer
-                        @(isDownloadingNewVersion ? (updateManager.IsUpdatePendingRestart ? "bg-primary text-white" : "bg-primary bg-opacity-20")
+        <div class="border-[1px] flex h-fit w-full cursor-pointer rounded-xl border-gray_1 px-6 py-3 @(isDownloadingNewVersion ? (updateManager.IsUpdatePendingRestart ? "bg-primary text-white" : "bg-primary bg-opacity-20")
                                                   : "from-primary/20 hover:from-primary hover:text-white bg-gradient-to-r to-black transition-all duration-500")">
 
             @if (isDownloadingNewVersion && !updateManager.IsUpdatePendingRestart)
             {
-                <div class="flex flex-col w-full">
-                    <h1 class="text-white font-bold text-lg tracking-widest">DOWNLOADING...</h1>
-                    <div class="bg-primary h-2.5 rounded-xl" style="width: @updateBarProgress%"></div>
+                <div class="flex w-full flex-col">
+                    <h1 class="text-lg font-bold tracking-widest text-white">DOWNLOADING...</h1>
+                    <div class="h-2.5 rounded-xl bg-primary" style="width: @updateBarProgress%"></div>
                 </div>
             }
             else if (updateManager.IsUpdatePendingRestart)
             {
-                <div class="flex flex-col w-full" @onclick="ApplyUpdatesAndRestart">
-                    <h1 class="text-white font-bold text-lg tracking-widest">CLICK TO RESTART AND APPLY UPDATES...</h1>
+                <div class="flex w-full flex-col" @onclick="ApplyUpdatesAndRestart">
+                    <h1 class="text-lg font-bold tracking-widest text-white">CLICK TO RESTART AND APPLY UPDATES...</h1>
                 </div>
             }
             else
             {
-                <div class="flex flex-col w-full" @onclick="DownloadNewUpdate">
-                    <h1 class="text-white font-bold text-lg tracking-widest">NEW UPDATE!</h1>
+                <div class="flex w-full flex-col" @onclick="DownloadNewUpdate">
+                    <h1 class="text-lg font-bold tracking-widest text-white">NEW UPDATE!</h1>
                     <p>A new version of BEACON has been found</p>
                 </div>
-                <div class="text-right w-full self-center">
+                <div class="w-full self-center text-right">
                     NEW VERSION - @newVersion
                 </div>
             }
         </div>
     }
 
-    <div class="flex flex-col relative w-full h-full">
+    <div class="relative flex h-full w-full flex-col">
 
         <div class="">
             SETTINGS
@@ -60,6 +59,7 @@
     protected override async Task OnInitializedAsync()
     {
         await CheckForUpdate().ConfigureAwait(false);
+        await InvokeAsync(StateHasChanged).ConfigureAwait(false);
     }
 
     //[UPDATE MANAGER]=========================================================
@@ -67,6 +67,7 @@
     {
         InvokeAsync(() => 
                     { 
+                        StateHasChanged();
                         updateBarProgress = percent;
                         StateHasChanged();
                     });
@@ -102,6 +103,8 @@
         if (newUpdate == null) return;
 
         newUpdateAvailable = true;
+        await InvokeAsync(StateHasChanged).ConfigureAwait(false);
         newVersion = newUpdate.TargetFullRelease.Version.ToString();
+        await InvokeAsync(StateHasChanged).ConfigureAwait(false);
     }
 }
