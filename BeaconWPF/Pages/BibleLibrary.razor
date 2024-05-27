@@ -2,17 +2,17 @@
 @inject IBibleService bibleService
 @inject IJSRuntime jSRuntime
 
-<div class="absolute top-0 left-0 hidden w-16 h-full bg-gray_2 -z-10 md:block"> </div>
+<div class="-z-10 absolute left-0 top-0 hidden h-full w-16 bg-gray_2 md:block"> </div>
 
-<div class="absolute w-full h-40 bg-gradient-to-r from-black to-gray_2 -z-0"></div>
+<div class="-z-0 absolute h-40 w-full bg-gradient-to-r from-black to-gray_2"></div>
 
-<div class="relative flex w-full h-full overflow-x-hidden">
+<div class="relative flex h-full w-full overflow-x-hidden">
 
     <!-- BOOKS -->
-    <div class="z-10 flex flex-col self-start w-full h-full gap-3 p-3 bg-gray_2 rounded-r-3xl md:min-w-56 md:w-56">
+    <div class="z-10 flex h-full w-full flex-col gap-3 self-start rounded-r-3xl bg-gray_2 p-3 md:min-w-56 md:w-56">
         
         <Dropdown Options="bibles" OnOptionChange="OnBibleChange"></Dropdown>
-        <DebounceInput id="BookSearchInput" type="text" class="w-full h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Book" DebounceTime="200"
+        <DebounceInput id="BookSearchInput" type="text" class="border-0 h-16 w-full rounded-xl bg-black px-4 text-sm" placeholder="Book" DebounceTime="200"
                        @bind-Value="bookSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnBookInputQuery" @onkeydown="OnBookSearchInputKeyDown" />
 
         <BookList Books="books" SelectedBook="selectedBook" OnBookChanged="OnBookChange"></BookList>
@@ -20,24 +20,24 @@
 
 
     <!-- CHAPTERS -->
-    <div class="z-10 flex flex-col self-start w-full h-full gap-3 p-3 rounded-r-3xl md:min-w-40 md:w-40">
+    <div class="z-10 flex h-full w-full flex-col gap-3 self-start rounded-r-3xl p-3 md:min-w-40 md:w-40">
         
         <ToggleButton Icon="M.A" Message="NEWT" Css="invisible pointer-events-none"></ToggleButton>
-        <DebounceInput id="ChapterSearchInput" type="text" class="w-full h-16 p-4 text-sm bg-black border-0 rounded-xl" placeholder="Chapter" DebounceTime="400"
+        <DebounceInput id="ChapterSearchInput" type="text" class="border-0 h-16 w-full rounded-xl bg-black p-4 text-sm" placeholder="Chapter" DebounceTime="400"
                        @bind-Value="chapterSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnChapterInputQuery" />
 
         <ChapterList Chapters="chapters" SelectedChapter="selectedChapter" OnChapterChanged="OnChapterChange"/>
     </div>
 
-    <div class="absolute h-full w-96 rounded-r-3xl bg-gray_3 -z-0"></div>
+    <div class="-z-0 absolute h-full w-96 rounded-r-3xl bg-gray_3"></div>
 
 
     <!-- RIGHT SIDE -->
-    <div class="z-20 flex flex-col w-full h-full overflow-x-auto">
+    <div class="z-20 flex h-full w-full flex-col overflow-x-auto">
 
-        <div class="flex flex-col w-full gap-3 px-3 py-3">
+        <div class="flex w-full flex-col gap-3 px-3 py-3">
             
-            <div class="flex flex-row-reverse w-full gap-3 ">
+            <div class="flex w-full flex-row-reverse gap-3">
                 <ToggleButton Icon="P" Message="DOUBLE VIEW" Css="@(showDoubleViewOptions ? "border-gray_1" : "invisible pointer-events-none")" IsChecked="doubleViewMode" OnClick="OnDoubleViewModeToggle" />
                 @if (doubleViewMode)
                 {
@@ -45,17 +45,17 @@
                 }
             </div>
 
-            <div class="flex justify-between w-full gap-3">
+            <div class="flex w-full justify-between gap-3">
 
-                <DebounceInput id="VerseSearchInput" type="text" class="w-20 h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Verse" DebounceTime="200"
+                <DebounceInput id="VerseSearchInput" type="text" class="border-0 h-16 w-20 rounded-xl bg-black px-4 text-sm" placeholder="Verse" DebounceTime="200"
                                @bind-Value="verseSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnVerseInputQuery"/>
-                <DebounceInput type="text" class="w-1/2 h-16 px-4 text-sm bg-black border-0 rounded-xl" placeholder="Bible Search" DebounceTime="200" />
+                <DebounceInput type="text" class="border-0 h-16 w-1/2 rounded-xl bg-black px-4 text-sm" placeholder="Bible Search" DebounceTime="200" />
 
             </div>
 
         </div>
 
-        <div class="flex w-full h-full px-1 py-1 overflow-y-hidden bg-black">
+        <div class="flex h-full w-full overflow-y-hidden bg-black px-1 py-1">
 
             <VerseList Id="VerseList1" Verses="verses" SelectedVerse="selectedVerse" OnVerseChanged="(async (verse) => await OnVerseChange(verse, true))"
                         VersePortions="versePortions" SelectedPortion="selectedPortion" OnVersePortionChanged="OnVersePortionChange"/>
@@ -197,10 +197,26 @@
         {
             DisplayWindow.Instance.Show();
             DisplayWindow.Instance.Content.Text = verse.Text;
-            DisplayWindow.Instance.Content.FontSize = 80;
+            DisplayWindow.Instance.Content.TextWrapping = TextWrapping.Wrap;
+            DisplayWindow.Instance.Content.Width = 1920;
             DisplayWindow.Instance.Content.HighlightCount = 0; 
             DisplayWindow.Instance.Header1.Text = selectedBook.Name.RemoveHighlight() + " " + selectedChapter.Id + ":" + verse.Verse;
             DisplayWindow.Instance.Header2.Text = isMain ? selectedBible.ToUpper() : selectedDoubleViewBible.ToUpper();
+
+            if(verse.Text.Count() > 400)
+            {
+                DisplayWindow.Instance.Content.FontSize = 70;
+            }
+            else if(verse.Text.Count() > 200)
+            {
+                DisplayWindow.Instance.Content.FontSize = 85;
+            }
+            else
+            {
+                DisplayWindow.Instance.Content.FontSize = 100;
+            }
+
+
         }).ConfigureAwait(false);
     }
 
@@ -208,7 +224,7 @@
     {
         await InvokeAsync(() => {
             DisplayWindow.Instance.Content.HighlightCount = versePortion.Item1;
-            DisplayWindow.Instance.Content.FontSize = 80;
+            //DisplayWindow.Instance.Content.FontSize = 80;
         }).ConfigureAwait(false);
     }
 
