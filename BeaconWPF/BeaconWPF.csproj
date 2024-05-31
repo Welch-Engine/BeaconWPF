@@ -13,11 +13,11 @@
 		<!--CHANGE VERSION HERE AS WELL-->
 		<Title>Beacon</Title>
 		<Author>Newt Welch</Author>
-		<Version>0.2.5</Version>
+		<Version>0.3.1</Version>
 		<PublisherName>Welch Engine</PublisherName>
 		<AssemblyTitle>Beacon</AssemblyTitle>
 		<AssemblyName>Beacon</AssemblyName>
-		<AssemblyVersion>0.2.5</AssemblyVersion>
+		<AssemblyVersion>0.3.1</AssemblyVersion>
 		
 		<StartupObject>BeaconWPF.Program</StartupObject>
 		
