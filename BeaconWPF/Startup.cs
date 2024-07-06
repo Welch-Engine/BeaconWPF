@@ -1,6 +1,8 @@
 using BeaconWPF.Data;
+using BeaconWPF.Data.Beacon;
 using BeaconWPF.Data.Bibles;
 using BeaconWPF.Data.Songs;
+using Blazored.SessionStorage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Net.Http;
@@ -22,11 +24,12 @@ namespace BeaconWPF
         private static void WireupServices(IServiceCollection services)
         {
             services.AddWpfBlazorWebView();
+            services.AddBlazoredSessionStorage();
+            services.AddSingleton<IHistoryService, HistoryService>();
             services.AddSingleton<ISongService, SongService>();
-
             services.AddSingleton<IBibleService, BibleService>();
-
             services.AddSingleton<ICustomHttpFactory, HttpFactory>();
+
 #if DEBUG
             services.AddBlazorWebViewDeveloperTools();
 #endif

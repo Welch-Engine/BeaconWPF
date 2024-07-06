@@ -13,7 +13,7 @@ namespace BeaconWPF.Data
     {
         public const string SongDatabase = "Songs.db";
         public const string BibleDatabase = "Bible.db";
-        public const string ArkDatabase = "Ark.db";
+        public const string BeaconDatabase = "Beacon.db";
         public static string basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Beacon");
 
         public const SQLiteOpenFlags Flags = SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache;
@@ -29,11 +29,11 @@ namespace BeaconWPF.Data
             get => Path.Combine(basePath, BibleDatabase);
         }
 
-        public static string ArkDbPath
+        public static string BeaconDbPath
         {
-            get => Path.Combine(basePath, ArkDatabase);
+            get => Path.Combine(basePath, BeaconDatabase);
         }
 
-        public static string webAPI = "https://ark.welchengine.com";
+        public static string webAPI = "https://beacon.welchengine.com";
     }
 }

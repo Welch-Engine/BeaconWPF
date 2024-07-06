@@ -5,7 +5,6 @@ namespace BeaconWPF.Data.Songs
 {
     public class SongService : ISongService
     {
-
         private SQLiteAsyncConnection dbConnection;
 
         public SongService()

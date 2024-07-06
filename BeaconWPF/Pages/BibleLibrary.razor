@@ -1,6 +1,8 @@
 ﻿@page "/BibleLibrary"
 @inject IBibleService bibleService
+@inject ISessionStorageService sessionStorage
 @inject IJSRuntime jSRuntime
+@implements IDisposable
 
 <div class="-z-10 absolute left-0 top-0 hidden h-full w-16 bg-gray_2 md:block"> </div>
 
@@ -112,6 +114,18 @@
 
         if(!String.IsNullOrWhiteSpace(selectedBible))
             books = await bibleService.GetBooksAsync(selectedBible).ConfigureAwait(false);
+
+
+        //SESSION
+        var sessionBook = await sessionStorage.GetItemAsync<Book>("selectedBook");
+        var sessionChapter = await sessionStorage.GetItemAsync<Chapter>("selectedChapter");
+        var sessionBible = await sessionStorage.GetItemAsy  nc<Bible>("selectedBible");
+
+        if (sessionBible is not null) await OnBibleChange(sessionBible);
+        if (sessionBook is not null) await OnBookChange(sessionBook);
+        if (sessionChapter is not null) await OnChapterChange(sessionChapter);
+        //TODO MORE SESSIONS; DOUBLE VIEW, SEARCHED
+        //SPEAKING OF SEARCH, IMPLEMENT ITTTT!!!
     }
 
     //[MAIN EVENTS]=====================================

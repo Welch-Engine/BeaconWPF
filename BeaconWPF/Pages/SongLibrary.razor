@@ -1,6 +1,9 @@
 ﻿@page "/SongLibrary"
 @inject ISongService songService
+@inject IHistoryService historyService
 @inject IJSRuntime jSRuntime
+@inject ISessionStorageService sessionStorage
+@implements IDisposable
 
 <div class="-z-10 absolute left-0 top-0 hidden h-full w-16 bg-gray_2 md:block"> </div>
 
@@ -66,7 +69,7 @@
 
                 @if (selectedSong.Id != 0)
                 {
-                    <ToggleButton Icon="@(isEditMode ? "s" : "E")" Message="@(isEditMode ? "SAVE" : "EDIT")" Css="border-gray_1 min-w-fit" OnClick="ToggleEditMode"></ToggleButton>
+                    <ToggleButton IsChecked="isEditMode" Icon="@(isEditMode ? "s" : "E")" Message="@(isEditMode ? "SAVE" : "EDIT")" Css="border-gray_1 min-w-fit" OnClick="ToggleEditMode"></ToggleButton>
                 }
             </div>
         </div>
@@ -114,6 +117,66 @@
         // https://stackoverflow.com/questions/2329978/the-calling-thread-must-be-sta-because-many-ui-components-require-this
 
         await RefreshSongs().ConfigureAwait(false);
+
+
+        //Session
+        Song sessionSong = await sessionStorage.GetItemAsync<Song>("selectedSong");
+        isEditMode = await sessionStorage.GetItemAsync<bool>("isEditMode");
+        songQueuesMode = await sessionStorage.GetItemAsync<bool>("songQueuesMode");
+        searchTerm = await sessionStorage.GetItemAsync<string>("searchTerm");
+
+        if (songQueuesMode)
+        {
+            songQueuesMode = false; // set it back to false
+            await ToggleSongQueuesMode(); // so we can toggle it to true
+        }
+
+        if(sessionSong is not null)
+        {
+            sessionSong.LyricText = "";
+            await OnSongChange(sessionSong);   
+        }
+
+        if (isEditMode)
+        {
+            isEditMode = false; // set it back to false
+            await ToggleEditMode(); // so we can toggle it to true
+        }
+
+        if (!String.IsNullOrEmpty(searchTerm)) await OnInputQuery();
+
+
+        // if (songQueuesMode)
+        // {
+        //     songs = await songService.GetQueueAsync();
+        // }
+        // else
+        // {
+        //     searchTerm = ""; // Blank the search term
+        //     await OnInputQuery(); // Then search songs
+        // }
+
+        // if (sessionSong is not null)
+        // {
+        //     await OnSongChange(sessionSong);
+
+        //     int index = songs.FindIndex(s => s.Id == selectedSong.Id);
+        //     // await Task.Delay(1);
+        //     // await jSRuntime.InvokeVoidAsync("ScrollTo", songElement, index);
+        //     // await Task.Delay(1);
+        // }
+        // if (!String.IsNullOrEmpty(searchTerm)) await OnInputQuery();
+        // if (selectedSong.Id != 0) showSongInfo = await sessionStorage.GetItemAsync<bool>("lyricHidden");
+    }
+
+    public async void Dispose()
+    {
+        await sessionStorage.SetItemAsync<bool>("isEditMode", isEditMode);
+        await sessionStorage.SetItemAsync<bool>("songQueuesMode", songQueuesMode);
+        await sessionStorage.SetItemAsync<bool>("showSongInfo", showSongInfo);
+        await sessionStorage.SetItemAsync<string>("searchTerm", searchTerm);
+        await sessionStorage.SetItemAsync<Song>("selectedSong", selectedSong);
+
     }
 
     //[EVENTS]=====================================
@@ -133,6 +196,8 @@
     }
     private async Task OnSongChange(Song song)
     {
+        if (song is null) return;
+
         selectedSong = await songService.GetAsync(song.Id).ConfigureAwait(false);
         selectedLyric = new Lyric();
 
@@ -150,10 +215,21 @@
     }
     private async Task OnLyricChange(Lyric lyric)
     {
+        if(lyric is null) return;
+
         selectedLyric = lyric;
 
         await Task.Delay(1).ConfigureAwait(false);
         await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "highlighted_lyric", "LyricList").ConfigureAwait(false);
+
+        historyService.AddHistory(new History()
+        {
+            Number = 0,
+            Date = DateTime.Now,
+            Description = "◼ " + selectedSong.Title,
+            SongID = selectedSong.Id,
+            BibleID = -1
+        });
 
         await InvokeAsync(() =>
         { 
@@ -176,6 +252,7 @@
             await jSRuntime.InvokeVoidAsync("SwitchFocusTo", "SongList").ConfigureAwait(false);
         }
     }
+
 
     //[REFACTOR]=====================================
     private async Task RefreshSongs(List<Song>? songList = null)
