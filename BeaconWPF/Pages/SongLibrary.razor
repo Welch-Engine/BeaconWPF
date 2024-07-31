@@ -20,25 +20,25 @@
         </div>
 
         <!-- QUERY SONG INPUT -->
-        @if(!songQueuesMode){
+        @if (!songQueuesMode) {
             <DebounceInput type="text" class="border-0 h-16 w-full rounded-xl bg-black px-4 text-sm" placeholder="Search..." DebounceTime="150"
-                           @bind-Value="searchTerm" @bind-Value:event="oninput" OnValueChanged="OnInputQuery" @onkeydown="OnSearchInputKeyDown" />
+            @bind-Value="searchTerm" @bind-Value:event="oninput" OnValueChanged="OnInputQuery" @onkeydown="OnSearchInputKeyDown" />
         }
         <!-- SONG LIST -->
         <SongList Songs="songs" SelectedSong="selectedSong" OnSongChanged="OnSongChange" SongQueueMode="songQueuesMode"
-                  AddRemoveSongFromQueue="@((song) => AddRemoveSongFromQueue(song))" DeleteSong="DeleteSong"></SongList>
+        AddRemoveSongFromQueue="@((song) => AddRemoveSongFromQueue(song))" DeleteSong="DeleteSong"></SongList>
     </div>
 
     <!-- EDIT SONG: LEFT HALF -->
     <div class="z-10 absolute flex h-full w-full flex-col gap-6 self-start rounded-r-3xl bg-gray_2 p-3 md:w-5/12 @(isEditMode ? "" : "hidden")">
-        
+
         <label class="-mb-5 font-bold tracking-widest">LYRIC EDITOR</label>
         <textarea class="border-0 h-full w-full rounded-xl bg-black bg-opacity-50 p-4 text-sm" placeholder="Lyrics" spellcheck="false"
-                  @bind="@selectedSong.LyricText" @bind:event="oninput"></textarea>
+        @bind="@selectedSong.LyricText" @bind:event="oninput"></textarea>
 
         <p class="-mb-5 font-bold tracking-widest">SEQUENCE</p>
         <input class="border-0 h-12 w-full rounded-xl bg-black bg-opacity-50 p-4 text-sm placeholder:opacity-50" placeholder="1, C, 2..." @bind-Value="@selectedSong.Sequence" @bind-Value:event="oninput" />
-        
+
         <p class="-mb-5 font-bold tracking-widest">LANGUAGE</p>
         <input class="border-0 h-12 w-full rounded-xl bg-black bg-opacity-50 p-4 text-sm placeholder:opacity-50" placeholder="Language" @bind-Value="@selectedSong.Language" @bind-Value:event="oninput" />
 
@@ -80,11 +80,11 @@
             <LyricList Lyrics="selectedSong.Lyrics()" SelectedLyric="selectedLyric" OnLyricChanged="OnLyricChange"></LyricList>
 
             <div class="flex h-fit w-full gap-2 overflow-x-auto p-1">
-                @foreach(var language in songLanguages)
+                @foreach (var language in songLanguages)
                 {
                     var isSelected = selectedSong.Id == language.Id;
                     <Button HasIconMargin="false" Message="@language.Language" Css="@(isSelected ? "bg-primary px-6 py-3 text-white" : "px-6 py-3 bg-gray_2")"
-                            OnClick="(async () => {await OnSongChange(language); })"></Button>
+                    OnClick="(async () => {await OnSongChange(language); })"></Button>
                 }
                 @if (selectedSong.Id != 0)
                 {
@@ -131,10 +131,10 @@
             await ToggleSongQueuesMode(); // so we can toggle it to true
         }
 
-        if(sessionSong is not null)
+        if (sessionSong is not null)
         {
             sessionSong.LyricText = "";
-            await OnSongChange(sessionSong);   
+            await OnSongChange(sessionSong);
         }
 
         if (isEditMode)
@@ -196,7 +196,7 @@
     }
     private async Task OnSongChange(Song song)
     {
-        if (song is null) return;
+        if (song is null || song.Id == 0) return;
 
         selectedSong = await songService.GetAsync(song.Id).ConfigureAwait(false);
         selectedLyric = new Lyric();
@@ -373,6 +373,8 @@
     private async Task AddLanguageToSong() => await songService.AddAsync(new Song(selectedSong.Number, "Title", "Author")).ConfigureAwait(false);
     private async Task GetLanguages()
     {
+        if(selectedSong is null) return;
+
         songLanguages.Clear();
         songLanguages = await songService.GetLanguagesOfSongAsync(selectedSong.Number).ConfigureAwait(false);
     }

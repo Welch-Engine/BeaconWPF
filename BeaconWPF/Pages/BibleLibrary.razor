@@ -119,13 +119,20 @@
         //SESSION
         var sessionBook = await sessionStorage.GetItemAsync<Book>("selectedBook");
         var sessionChapter = await sessionStorage.GetItemAsync<Chapter>("selectedChapter");
-        var sessionBible = await sessionStorage.GetItemAsy  nc<Bible>("selectedBible");
+        var sessionBible = await sessionStorage.GetItemAsync<string>("selectedBible");
 
         if (sessionBible is not null) await OnBibleChange(sessionBible);
         if (sessionBook is not null) await OnBookChange(sessionBook);
         if (sessionChapter is not null) await OnChapterChange(sessionChapter);
         //TODO MORE SESSIONS; DOUBLE VIEW, SEARCHED
         //SPEAKING OF SEARCH, IMPLEMENT ITTTT!!!
+    }
+
+    public async void Dispose()
+    {
+        await sessionStorage.SetItemAsync<Book>("selectedBook", selectedBook);
+        await sessionStorage.SetItemAsync<Chapter>("selectedChapter", selectedChapter);
+        await sessionStorage.SetItemAsync<string>("selectedBible", selectedBible);
     }
 
     //[MAIN EVENTS]=====================================

@@ -2,7 +2,7 @@
 
 @if (Verses is not null)
 {
-    <div id="@Id" tabindex="0" class="flex flex-col w-full h-full gap-1 overflow-auto bg-gray rounded-xl scroll-gutter outline-0"
+    <div id="@Id" tabindex="0" class="bg-gray scroll-gutter outline-0 flex h-full w-full flex-col gap-1 overflow-auto rounded-xl"
          @onkeydown="((args) => OnKeyDown(args))">
 
         @foreach (var verse in Verses)
@@ -39,9 +39,8 @@
     {
         shouldNextVerse = false;
         await OnVersePortionChanged.InvokeAsync(portion).ConfigureAwait(false);
-        await Task.Delay(10).ConfigureAwait(false);
+        await Task.Delay(5).ConfigureAwait(false);
         SelectedPortion = portion;
-        await InvokeAsync(StateHasChanged);
     }
 
     private DateTime lastKeyDownTime = DateTime.MinValue;
@@ -91,7 +90,7 @@
             {
                 var verseIndex = Verses!.IndexOf(Verses.Where(v => v.Verse == SelectedVerse!.Verse).First());
                 shouldNextVerse = false;
-                await Task.Delay(10);
+                await Task.Delay(5);
                 await ChangeVerse(Verses[Math.Max(verseIndex - 1, 0)]).ConfigureAwait(false);
                 SelectedPortion = VersePortions[VersePortions.Count() - 1];
 
@@ -108,7 +107,7 @@
             {
                 var verseIndex = Verses!.IndexOf(Verses.Where(v => v.Verse == SelectedVerse!.Verse).First());
                 shouldNextVerse = false;
-                await Task.Delay(10);
+                await Task.Delay(5);
                 await ChangeVerse(Verses[Math.Min(verseIndex + 1, Verses.Count() - 1)]).ConfigureAwait(false);
                 SelectedPortion = VersePortions[0];
 
