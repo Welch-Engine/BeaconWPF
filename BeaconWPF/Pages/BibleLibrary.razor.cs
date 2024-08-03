@@ -9,6 +9,8 @@ namespace BeaconWPF.Pages
 {
     public partial class BibleLibrary
     {
+        //TODO: UX for when there is a search Term and moving books or chapters.
+
         private List<Book> books = new List<Book>();
         private List<Chapter> chapters = new List<Chapter>();
         private List<BeaconVerse> verses = new List<BeaconVerse>();
@@ -58,12 +60,20 @@ namespace BeaconWPF.Pages
             var sessionBook = await sessionStorage.GetItemAsync<Book>("selectedBook");
             var sessionChapter = await sessionStorage.GetItemAsync<Chapter>("selectedChapter");
             var sessionBible = await sessionStorage.GetItemAsync<Tuple<string, string>>("selectedBible");
+            var sessionDoubleViewBible = await sessionStorage.GetItemAsync<Tuple<string, string>>("selectedDoubleViewBible");
+            var sessiondoubleViewMode = await sessionStorage.GetItemAsync<bool>("doubleViewMode");
+            var sessionVerseSearchTerm = await sessionStorage.GetItemAsync<string>("verseSearchTerm");
 
             if (sessionBible is not null) await OnBibleChange(sessionBible);
+            if (sessionDoubleViewBible is not null) await OnDoubleViewBibleChange(sessionDoubleViewBible);
             if (sessionBook is not null) await OnBookChange(sessionBook);
             if (sessionChapter is not null) await OnChapterChange(sessionChapter);
-            //TODO MORE SESSIONS; DOUBLE VIEW, SEARCHED
-            //SPEAKING OF SEARCH, IMPLEMENT ITTTT!!!
+            if (!String.IsNullOrWhiteSpace(sessionVerseSearchTerm))
+            {
+                verseSearchTerm = sessionVerseSearchTerm;
+                await OnVerseTermSearch();
+            }
+            doubleViewMode = sessiondoubleViewMode;
         }
 
         public async void Dispose()
@@ -71,6 +81,9 @@ namespace BeaconWPF.Pages
             await sessionStorage.SetItemAsync<Book>("selectedBook", selectedBook);
             await sessionStorage.SetItemAsync<Chapter>("selectedChapter", selectedChapter);
             await sessionStorage.SetItemAsync<Tuple<string, string>>("selectedBible", selectedBible);
+            await sessionStorage.SetItemAsync<Tuple<string, string>>("selectedDoubleViewBible", selectedDoubleViewBible);
+            await sessionStorage.SetItemAsync<bool>("doubleViewMode", doubleViewMode);
+            await sessionStorage.SetItemAsync<string>("verseSearchTerm", verseSearchTerm);
         }
 
         //[MAIN EVENTS]=====================================

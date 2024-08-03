@@ -44,7 +44,6 @@ namespace BeaconWPF.Data.Songs
             {
                 foreach (var lyric in ConvertTextToLyrics(song.LyricText))
                 {
-
                     bool isStanza = lyric.Type.Equals(LyricType.Stanza);
                     bool isPrechorus = lyric.Type.Equals(LyricType.Bridge);
                     bool isChorus = lyric.Type.Equals(LyricType.Chorus);
@@ -141,13 +140,15 @@ namespace BeaconWPF.Data.Songs
 
 
                 var lyric = new Lyric();
+                var split = p.Split(Environment.NewLine.ToCharArray(), 2);
+                if(split.Count() == 2)
+                    lyric.Text = split.Skip(1).FirstOrDefault()!.Trim();
 
                 switch (firstLine)
                 {
                     case "prechorus": case "pre chorus":
                     case "pre-chorus": case "pc":
                     case "pre chor": case "pre-chor":
-                        lyric.Text = p.Remove(0, firstLine.Length + 2);
                         lyric.Line = "PRE";
                         lyric.Type = LyricType.PreChorus;
                         break;
@@ -155,14 +156,12 @@ namespace BeaconWPF.Data.Songs
                     case "chorus":
                     case "chorusi": case "chorus i":
                     case "chorus1": case "chorus 1":
-                        lyric.Text = p.Remove(0, firstLine.Length + 2);
                         lyric.Line = "C";
                         lyric.Type = LyricType.Chorus;
                         break;
 
                     case "chorusii": case "chorus ii":
                     case "chorus2": case "chorus 2":
-                        lyric.Text = p.Remove(0, firstLine.Length + 2);
                         lyric.Line = "C2";
                         lyric.Type = LyricType.ChorusII;
                         break;
@@ -170,7 +169,6 @@ namespace BeaconWPF.Data.Songs
 
                     case "chorusiii": case "chorus iii":
                     case "chorus3": case "chorus 3":
-                        lyric.Text = p.Remove(0, firstLine.Length + 2);
                         lyric.Line = "C3";
                         lyric.Type = LyricType.ChorusIII;
                         break;
@@ -178,21 +176,18 @@ namespace BeaconWPF.Data.Songs
                     case "bridge":
                     case "bridgei": case "bridge i":
                     case "bridge1": case "bridge 1":
-                        lyric.Text = p.Remove(0, firstLine.Length + 2);
                         lyric.Line = "B";
                         lyric.Type = LyricType.Bridge;
                         break;
 
                     case "bridgeii": case "bridge ii":
                     case "bridge2": case "bridge 2":
-                        lyric.Text = p.Remove(0, firstLine.Length + 2);
                         lyric.Line = "B2";
                         lyric.Type = LyricType.BridgeII;
                         break;
 
                     case "bridgeiii": case "bridge iii":
                     case "bridge3": case "bridge 3":
-                        lyric.Text = p.Remove(0, firstLine.Length + 2);
                         lyric.Line = "B3";
                         lyric.Type = LyricType.BridgeIII;
                         break;
