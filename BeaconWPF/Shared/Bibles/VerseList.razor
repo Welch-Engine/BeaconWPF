@@ -12,7 +12,7 @@
 
             <VerseItem Verse="verse" IsSelected="isSelected" OnItemClick="ChangeVerse" IsAlsoSelectedVerse="isAlsoSelectedVerse"
                        VersePortions="VersePortions" SelectedPortion="SelectedPortion" OnPortionKeyDown="OnPortionKeyDown"
-                        OnItemPortionClick="ChangeVersePortion"></VerseItem>
+                        OnItemPortionClick="ChangeVersePortion" ShowBookAndChapter="ShowBookAndChapter"></VerseItem>
         }
 
     </div>
@@ -21,6 +21,7 @@
     [Parameter] public List<BeaconVerse>? Verses { get; set; }
     [Parameter] public BeaconVerse? SelectedVerse { get; set; }
     [Parameter] public string? Id { get; set; }
+    [Parameter] public bool ShowBookAndChapter { get; set; }
     [Parameter] public EventCallback<BeaconVerse> OnVerseChanged { get; set; }
     [Parameter] public EventCallback<Tuple<int, string>> OnVersePortionChanged { get; set; }
 

@@ -1,7 +1,7 @@
-﻿<div tabindex="0" class="relative flex border-[1px] rounded-xl border-gray_1 cursor-pointer @Css"
+﻿<div tabindex="0" class="border-[1px] relative flex cursor-pointer rounded-xl border-gray_1 @Css"
      onclick="@(() =>{ showOptions = !showOptions; })" onblur="@(() =>{ showOptions = false; })">
-    <p class="w-full px-6 py-3 overflow-hidden truncate h-fit">@SelectedOption</p>
-    <div class="flex items-center flex-1 h-full px-3 w-fit bg-gray_1 rounded-xl">
+    <p class="h-fit w-full overflow-hidden truncate px-6 py-3">@SelectedOption.Item2</p>
+    <div class="flex-1 flex h-full w-fit items-center rounded-xl bg-gray_1 px-3">
         <svg width="13px" height="8px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
         <g transform="matrix(1,0,0,1,-2159.69,-37.298)">
         <g transform="matrix(0.0385476,0,0,0.0385476,2159.69,26.2001)">
@@ -12,11 +12,11 @@
     </div>
 
     @if(showOptions){
-        <div class="absolute flex flex-col w-full overflow-auto min-h-fit max-h-32 bg-gray_1 rounded-xl mt-11">
+        <div class="absolute mt-11 flex max-h-32 min-h-fit w-full flex-col overflow-auto rounded-xl bg-gray_1">
             @foreach(var option in Options)
             {
-                <div class="px-6 py-3 cursor-pointer hover:text-white hover:bg-primary hover:bg-opacity-20 rounded-xl"
-                     onclick="@(async () => { await OptionClicked(option.Item1, option.Item2); })">
+                <div class="cursor-pointer rounded-xl px-6 py-3 hover:text-white hover:bg-primary hover:bg-opacity-20"
+                     onclick="@(async () => { await OptionClicked(option); })">
                     @option.Item2
                 </div>
             }
@@ -28,23 +28,23 @@
 @code {
     //ITEM 1 = VALUE, ITEM 2 = DISPLAYSTRING
     [Parameter] public List<Tuple<string, string>> Options { get; set; } = new List<Tuple<string, string>>();
-    [Parameter] public string SelectedOption { get; set; } = "";
+    [Parameter] public Tuple<string, string> SelectedOption { get; set; } = new Tuple<string, string>("","");
     [Parameter] public string Css { get; set; } = "";
-    [Parameter] public EventCallback<string> OnOptionChange { get; set; }
+    [Parameter] public EventCallback<Tuple<string, string>> OnOptionChange { get; set; }
 
     private bool showOptions;
 
     protected override void OnParametersSet()
     {
-        if (String.IsNullOrWhiteSpace(SelectedOption) && Options.Count() != 0)
+        if (String.IsNullOrWhiteSpace(SelectedOption.Item1) && Options.Count() != 0)
         {
-            SelectedOption = Options[0].Item2;
+            SelectedOption = Options[0];
         }
     }
 
-    public async Task OptionClicked(string value, string display)
+    public async Task OptionClicked(Tuple<string, string> selectedOption)
     {
-        SelectedOption = display;
-        await OnOptionChange.InvokeAsync(value).ConfigureAwait(false);
+        SelectedOption = selectedOption;
+        await OnOptionChange.InvokeAsync(selectedOption).ConfigureAwait(false);
     }
 }

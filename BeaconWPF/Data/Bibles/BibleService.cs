@@ -2,6 +2,8 @@
 using SQLite;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.RegularExpressions;
+using System.Windows.Controls.Primitives;
 
 namespace BeaconWPF.Data.Bibles
 {
@@ -54,7 +56,15 @@ namespace BeaconWPF.Data.Bibles
 
             return books;
         }
+        public async Task<List<BeaconVerse>> SearchVerseFromChapterAsync(string translation, int Book, int Chapter, string searchTerm)
+        {
+            var verses = new List<BeaconVerse>();
 
+            searchTerm = searchTerm.Trim().Replace("'", " ").Replace(" ", "* ");
+            verses = await dbConnection.QueryAsync<BeaconVerse>($"SELECT Book, BookName, Chapter, Verse, highlight({translation}, 4, '<span class=\"text-orange group-hover:text-white_light\">', '</span>') as Text FROM {translation} WHERE Text MATCH '\"{searchTerm}\"*' AND Book = {Book} AND Chapter = {Chapter}");
+
+            return verses;
+        }
 
         //[API]=========================================
         public async Task DownloadBible(string translation)
@@ -116,5 +126,6 @@ namespace BeaconWPF.Data.Bibles
         public Task<List<BeaconVerse>> GetVersesAsync(string translation, int book, int chapter);
         public Task<List<Book>> SearchBooksAsync(string translation, string searchTerm, bool useEnglish = false);
         public Task DownloadBible(string translation);
+        public Task<List<BeaconVerse>> SearchVerseFromChapterAsync(string translation, int Book, int Chapter, string searchTerm);
     }
 }

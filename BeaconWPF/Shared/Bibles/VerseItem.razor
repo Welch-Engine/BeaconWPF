@@ -1,19 +1,24 @@
 ﻿@if (Verse is not null)
 {
-    <div class="border-gray_1 border-[1px] flex rounded-xl min-h-fit w-full cursor-pointer outline-0
-                                                @(IsSelected ? "bg-primary text-white selected_Verse" : "hover:text-white hover:bg-primary hover:bg-opacity-20")
-                                                @(IsAlsoSelectedVerse ? "selected_Verse bg-primary bg-opacity-20" : "")"
-         @onclick="ItemClick">
-        <p id="@($"Verse{Verse.Verse}")" tabindex="0" @onkeydown="OnKeyDown" class="w-full p-6 text-sm bg-opacity-25 bg-gray_dark text-wrap outline-0">
-            <span>@Verse.Verse.&nbsp;</span>
+    <div class="border-[1px] outline-0 flex min-h-fit w-full cursor-pointer rounded-xl border-gray_1 @(IsSelected ? "bg-primary text-white selected_Verse" : "hover:text-white hover:bg-primary hover:bg-opacity-20") @(IsAlsoSelectedVerse ? "selected_Verse bg-primary bg-opacity-20" : "")"
+    @onclick="ItemClick">
+        <p id="@($"Verse{Verse.Verse}")" tabindex="0" @onkeydown="OnKeyDown" class="bg-gray_dark outline-0 w-full text-wrap bg-opacity-25 p-6 text-sm">
+            @if (!ShowBookAndChapter)
+            {
+                <span>@Verse.Verse.&nbsp;</span>
+            }
+            else
+            {
+                <span class="font-bold tracking-widest text-white opacity-75">@Verse.BookName @Verse.Chapter:@Verse.Verse &nbsp;</span>
+            }   
+                
             @if (IsSelected && VersePortions is not null)
             {
                 foreach (var portion in VersePortions)
                 {
                     var isSelected = portion.Item1 == SelectedPortion!.Item1 && portion.Item2 == SelectedPortion.Item2;
 
-                    <span class="bg-gray_2 cursor-pointer p-2 rounded-xl m-1 leading-10
-                                     @(isSelected ? "text-orange bg-opacity-100" : "hover:bg-opacity-100 bg-opacity-75")"
+                    <span class="leading-10 m-1 cursor-pointer rounded-xl bg-gray_2 p-2 @(isSelected ? "text-orange bg-opacity-100" : "hover:bg-opacity-100 bg-opacity-75")"
                           @onclick="(async () => { await ItemPortionClick(portion); })" @onclick:stopPropagation="true">@portion.Item2&nbsp;
                     </span>
                 }
@@ -29,6 +34,7 @@
 @code {
     [Parameter] public BeaconVerse? Verse { get; set; }
     [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public bool ShowBookAndChapter { get; set; }
     [Parameter] public bool IsAlsoSelectedVerse { get; set; } // For scrolling with double view
     [Parameter] public EventCallback<KeyboardEventArgs> OnPortionKeyDown { get; set; }
     [Parameter] public EventCallback<BeaconVerse> OnItemClick { get; set; }

@@ -26,7 +26,7 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>BeaconWPF</RootNamespace>
-        <ApplicationIcon>Resources\Images\Main_ Ark.ico</ApplicationIcon>
+        <ApplicationIcon>Resources\Images\Beacon.ico</ApplicationIcon>
 		
     </PropertyGroup>
 
@@ -37,12 +37,26 @@
 	<ItemGroup>
 		<EmbeddedResource Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <Content Remove="Pages\SettingsPage.razor" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <EmbeddedResource Remove="wwwroot\Beacon.ico" />
+	</ItemGroup>
 
     <ItemGroup>
-      <Resource Include="Resources\Images\Main_ Ark.ico" />
+      <Resource Include="Resources\Images\Beacon.ico">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="wwwroot\Beacon.ico">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 
     <ItemGroup>
+      <None Include="Pages\SettingsPage.razor" />
       <None Include="Shared\Commons\Button.razor" />
       <None Include="Shared\Commons\ToggleButton.razor" />
       <None Include="Shared\Songs\LyricItem.razor" />
@@ -75,6 +89,14 @@
         <Content Update="wwwroot\index.html">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Pages\SettingsPage.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\SettingsPage.razor" />
     </ItemGroup>
 
 </Project>
