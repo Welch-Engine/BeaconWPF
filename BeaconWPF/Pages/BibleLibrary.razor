@@ -12,9 +12,8 @@
 
     <!-- BOOKS -->
     <div class="z-10 flex h-full w-full flex-col gap-3 self-start rounded-r-3xl bg-gray_2 p-3 md:min-w-56 md:w-56">
-        
-        <Dropdown Options="bibles" OnOptionChange="OnBibleChange" SelectedOption="@selectedBible"></Dropdown>
-            
+
+        <ToggleButton Icon="M.A" Message="NEWT" Css="invisible pointer-events-none"></ToggleButton>
         <DebounceInput id="BookSearchInput" type="text" class="border-0 h-16 w-full rounded-xl bg-black px-4 text-sm" placeholder="Book" DebounceTime="200"
                        @bind-Value="bookSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnBookInputQuery" @onkeydown="OnBookSearchInputKeyDown" />
 
@@ -53,13 +52,17 @@
                 }
             </div>
 
-            <div class="flex w-full justify-between gap-3">
+            <div class="flex w-full">
 
                 <DebounceInput id="VerseSearchInput" type="text" class="border-0 h-16 w-20 rounded-xl bg-black px-4 text-sm" placeholder="Verse" DebounceTime="200"
                                @bind-Value="verseIdSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnVerseInputQuery" />
-               
-                <DebounceInput type="text" class="border-0 h-16 w-1/2 rounded-xl bg-black px-4 text-sm" placeholder="Bible Search" DebounceTime="200"
-                               @bind-Value="verseSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnVerseTermSearch" />
+                <div class="flex w-full items-center justify-end gap-3">
+                    <Dropdown Options="bibles" OnOptionChange="OnBibleChange" SelectedOption="@selectedBible" Css="h-11 item-end"></Dropdown>
+
+                    <DebounceInput type="text" class="border-0 item-end h-16 w-1/2 rounded-xl bg-black px-4 text-sm" placeholder="Bible Search" DebounceTime="200"
+                                   @bind-Value="verseSearchTerm" @bind-Value:event="oninput" OnValueChanged="OnVerseTermSearch" />
+                </div>
+
 
             </div>
 

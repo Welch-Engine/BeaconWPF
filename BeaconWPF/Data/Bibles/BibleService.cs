@@ -56,12 +56,23 @@ namespace BeaconWPF.Data.Bibles
 
             return books;
         }
+
         public async Task<List<BeaconVerse>> SearchVerseFromChapterAsync(string translation, int Book, int Chapter, string searchTerm)
         {
             var verses = new List<BeaconVerse>();
 
             searchTerm = searchTerm.Trim().Replace("'", " ").Replace(" ", "* ");
             verses = await dbConnection.QueryAsync<BeaconVerse>($"SELECT Book, BookName, Chapter, Verse, highlight({translation}, 4, '<span class=\"text-orange group-hover:text-white_light\">', '</span>') as Text FROM {translation} WHERE Text MATCH '\"{searchTerm}\"*' AND Book = {Book} AND Chapter = {Chapter}");
+
+            return verses;
+        }
+
+        public async Task<List<BeaconVerse>> SearchVerseGloballyAsync(string translation, string searchTerm)
+        {
+            var verses = new List<BeaconVerse>();
+
+            searchTerm = searchTerm.Trim().Replace("'", " ").Replace(" ", "* ");
+            verses = await dbConnection.QueryAsync<BeaconVerse>($"SELECT Book, BookName, Chapter, Verse, highlight({translation}, 4, '<span class=\"text-orange group-hover:text-white_light\">', '</span>') as Text FROM {translation} WHERE Text MATCH '\"{searchTerm}\"*' LIMIT 50");
 
             return verses;
         }
@@ -127,5 +138,6 @@ namespace BeaconWPF.Data.Bibles
         public Task<List<Book>> SearchBooksAsync(string translation, string searchTerm, bool useEnglish = false);
         public Task DownloadBible(string translation);
         public Task<List<BeaconVerse>> SearchVerseFromChapterAsync(string translation, int Book, int Chapter, string searchTerm);
+        public Task<List<BeaconVerse>> SearchVerseGloballyAsync(string translation, string searchTerm);
     }
 }

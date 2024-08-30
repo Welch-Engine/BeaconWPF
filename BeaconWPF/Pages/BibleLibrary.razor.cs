@@ -93,7 +93,6 @@ namespace BeaconWPF.Pages
 
             await GetBooksFromBible(bible.Item1).ConfigureAwait(false);
             selectedBible = bible;
-            selectedVerse = new BeaconVerse();
 
             if (selectedBook.Id != 0)
                 await GetChaptersFromBook(bible.Item1, selectedBook.Id).ConfigureAwait(false);
@@ -101,6 +100,11 @@ namespace BeaconWPF.Pages
             if (selectedChapter.Id != 0)
                 await GetVersesFromChapter(bible.Item1, selectedBook.Id, selectedChapter.Id).ConfigureAwait(false);
 
+            if (selectedVerse is not null && selectedVerse.Verse != 0)
+            {
+                int saveVerse = selectedVerse.Verse;
+                await OnVerseChange(verses[saveVerse - 1], true).ConfigureAwait(false);
+            }
         }
         private async Task OnBookChange(Book book)
         {
@@ -119,6 +123,7 @@ namespace BeaconWPF.Pages
             chapterSearchTerm = "";
             verseIdSearchTerm = "";
             await jSRuntime.InvokeVoidAsync("ScrollWithDefinedSize", "ChapterList", book.Id - 1).ConfigureAwait(false);
+
         }
         private async Task OnChapterChange(Chapter chapter)
         {
@@ -154,13 +159,13 @@ namespace BeaconWPF.Pages
             if (isMain)
             {
                 await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList1").ConfigureAwait(false);
-                await Task.Delay(300).ConfigureAwait(false);
+                await Task.Delay(150).ConfigureAwait(false);
                 await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList2").ConfigureAwait(false);
             }
             else
             {
                 await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList2").ConfigureAwait(false);
-                await Task.Delay(300).ConfigureAwait(false);
+                await Task.Delay(150).ConfigureAwait(false);
                 await jSRuntime.InvokeVoidAsync("ScrollLogarithmically", "selected_Verse", "VerseList1").ConfigureAwait(false);
             }
 
@@ -280,7 +285,7 @@ namespace BeaconWPF.Pages
             showBookAndChapter = verseSearchTerm.StartsWith(".");
 
             if (verseSearchTerm.StartsWith("."))
-                searchedVerses.Clear(); //TODO: Search entire bible. probably do 25 or 50 results only
+                searchedVerses = await bibleService.SearchVerseGloballyAsync(selectedBible.Item1, verseSearchTerm.Remove(0, 1)).ConfigureAwait(false);
             else
                 searchedVerses = await bibleService.SearchVerseFromChapterAsync(selectedBible.Item1, selectedBook.Id, selectedChapter.Id, verseSearchTerm).ConfigureAwait(false);
         }
@@ -292,7 +297,7 @@ namespace BeaconWPF.Pages
             
             if (doubleViewMode)
             {
-                if(selectedDoubleViewBible == selectedBible && bibles.Count != 0)
+                if(selectedDoubleViewBible.Item1 == selectedBible.Item1 && bibles.Count != 0)
                 {
                     selectedDoubleViewBible = bibles.Where(b => b != selectedDoubleViewBible).ToList()!.FirstOrDefault()!;
                     await OnDoubleViewBibleChange(selectedDoubleViewBible).ConfigureAwait(false);
@@ -308,6 +313,7 @@ namespace BeaconWPF.Pages
             doubleViewVerses.Clear();
             doubleViewVerses = await bibleService.GetVersesAsync(bible.Item1, selectedBook.Id, selectedChapter.Id).ConfigureAwait(false);
         }
+
         private async Task OnBookSearchInputKeyDown(KeyboardEventArgs e)
         {
             await Task.Delay(100).ConfigureAwait(false);
