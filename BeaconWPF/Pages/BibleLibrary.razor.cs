@@ -200,8 +200,21 @@ namespace BeaconWPF.Pages
         private async Task OnSearchVerseClick(BeaconVerse verse)
         {
             isSearchingVerses = false;
+            selectedVerse = new BeaconVerse();
+
+            if (verseSearchTerm.StartsWith("."))
+            {
+                await Task.Delay(100).ConfigureAwait(false);
+                await OnBookChange(books[verse.Book - 1]).ConfigureAwait(false);
+                await Task.Delay(100).ConfigureAwait(false);
+                await OnChapterChange(chapters[verse.Chapter - 1]).ConfigureAwait(false);
+                await Task.Delay(500).ConfigureAwait(false);
+            }
+
+            await OnVerseChange(verses[verse.Verse - 1], false).ConfigureAwait(false);
+
+            await Task.Delay(10).ConfigureAwait(false);
             verseSearchTerm = "";
-            await OnVerseChange(verse, false).ConfigureAwait(false);
         }
 
         private async Task OnVersePortionChange(Tuple<int, string> versePortion)
@@ -283,6 +296,7 @@ namespace BeaconWPF.Pages
             doubleViewMode = false;
             isSearchingVerses = !String.IsNullOrWhiteSpace(verseSearchTerm);
             showBookAndChapter = verseSearchTerm.StartsWith(".");
+            selectedVerse = new BeaconVerse();
 
             if (verseSearchTerm.StartsWith("."))
                 searchedVerses = await bibleService.SearchVerseGloballyAsync(selectedBible.Item1, verseSearchTerm.Remove(0, 1)).ConfigureAwait(false);
